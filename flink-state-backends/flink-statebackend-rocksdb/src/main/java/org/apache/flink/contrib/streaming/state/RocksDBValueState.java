@@ -79,6 +79,10 @@ class RocksDBValueState<K, N, V> extends AbstractRocksDBState<K, N, V>
     @Override
     public V value() {
         try {
+            byte[] key = serializeCurrentKeyWithGroupAndNamespace();
+            if (this.cache.has(key)) {
+                return (V) this.cache.get(key);
+            }
             byte[] valueBytes =
                     backend.db.get(columnFamily, serializeCurrentKeyWithGroupAndNamespace());
 
@@ -86,7 +90,9 @@ class RocksDBValueState<K, N, V> extends AbstractRocksDBState<K, N, V>
                 return getDefaultValue();
             }
             dataInputView.setBuffer(valueBytes);
-            return valueSerializer.deserialize(dataInputView);
+            V value = valueSerializer.deserialize(dataInputView);
+            this.cache.update(key, value);
+            return value;
         } catch (IOException | RocksDBException e) {
             throw new FlinkRuntimeException("Error while retrieving data from RocksDB.", e);
         }
@@ -100,11 +106,13 @@ class RocksDBValueState<K, N, V> extends AbstractRocksDBState<K, N, V>
         }
 
         try {
+            byte[] key = serializeCurrentKeyWithGroupAndNamespace();
             backend.db.put(
                     columnFamily,
                     writeOptions,
-                    serializeCurrentKeyWithGroupAndNamespace(),
+                    key,
                     serializeValue(value));
+            this.cache.update(key, value);
         } catch (Exception e) {
             throw new FlinkRuntimeException("Error while adding data to RocksDB", e);
         }
