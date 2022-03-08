@@ -23,6 +23,7 @@ public class LRUCacheManager <V> extends AbstractCacheManager <V>{
     // assume has already check key exists with hash
     @Override
     public V get(byte[] key) {
+        logger.info("--- lru get ---");
         return storage.getOrDefault(key, null);
     }
 
@@ -31,11 +32,13 @@ public class LRUCacheManager <V> extends AbstractCacheManager <V>{
         if (this.storage.size() >= this.size && !this.has(key)) {
             this.evict();
         }
+        logger.info("--- lru update ---");
         storage.put(key, value);
     }
 
     @Override
     protected void evict() {
+        logger.info("--- lru evict ---");
         Map.Entry<byte[], V> firstEntry = storage.entrySet().iterator().next();
         this.storage.remove(firstEntry.getKey());
     }

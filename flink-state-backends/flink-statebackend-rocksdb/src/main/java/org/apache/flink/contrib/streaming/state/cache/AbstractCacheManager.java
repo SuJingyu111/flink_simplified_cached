@@ -1,5 +1,8 @@
 package org.apache.flink.contrib.streaming.state.cache;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Javadoc for RocksDBStateCache.
  * Interface for cache manager.
@@ -7,6 +10,8 @@ package org.apache.flink.contrib.streaming.state.cache;
 public abstract class AbstractCacheManager <V> {
 
     protected int size; //size of cache, can be in terms of bytes or # of kv pairs
+
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     public AbstractCacheManager(int size) {
         this.size = size;
