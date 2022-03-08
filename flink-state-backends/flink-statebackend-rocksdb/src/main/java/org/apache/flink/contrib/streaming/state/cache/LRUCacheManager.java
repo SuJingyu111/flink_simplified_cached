@@ -34,7 +34,6 @@ public class LRUCacheManager <V> extends AbstractCacheManager <V>{
         storage.put(key, value);
     }
 
-
     @Override
     protected void evict() {
         Map.Entry<byte[], V> firstEntry = storage.entrySet().iterator().next();
