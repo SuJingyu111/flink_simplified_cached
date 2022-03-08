@@ -3,10 +3,8 @@ package org.apache.flink.contrib.streaming.state.cache;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/**
- * Javadoc for LRUCacheManager.
- */
-public class LRUCacheManager <V> extends AbstractCacheManager <V>{
+/** Javadoc for LRUCacheManager. */
+public class LRUCacheManager<V> extends AbstractCacheManager<V> {
 
     private LinkedHashMap<byte[], V> storage;
 

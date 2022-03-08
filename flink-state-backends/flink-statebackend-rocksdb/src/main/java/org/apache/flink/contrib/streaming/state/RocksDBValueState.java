@@ -107,11 +107,7 @@ class RocksDBValueState<K, N, V> extends AbstractRocksDBState<K, N, V>
 
         try {
             byte[] key = serializeCurrentKeyWithGroupAndNamespace();
-            backend.db.put(
-                    columnFamily,
-                    writeOptions,
-                    key,
-                    serializeValue(value));
+            backend.db.put(columnFamily, writeOptions, key, serializeValue(value));
             this.cache.update(key, value);
         } catch (Exception e) {
             throw new FlinkRuntimeException("Error while adding data to RocksDB", e);
