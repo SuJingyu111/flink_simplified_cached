@@ -20,6 +20,7 @@ package org.apache.flink.contrib.streaming.state;
 import org.apache.flink.api.common.state.State;
 import org.apache.flink.api.common.typeutils.TypeSerializer;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.contrib.streaming.state.cache.RocksDBStateCache;
 import org.apache.flink.core.memory.DataInputDeserializer;
 import org.apache.flink.core.memory.DataOutputSerializer;
 import org.apache.flink.queryablestate.client.state.serialization.KvStateSerializer;
@@ -63,6 +64,8 @@ public abstract class AbstractRocksDBState<K, N, V> implements InternalKvState<K
     /** The column family of this particular instance of state. */
     protected ColumnFamilyHandle columnFamily;
 
+    protected RocksDBStateCache cache;
+
     protected final V defaultValue;
 
     protected final WriteOptions writeOptions;
@@ -102,6 +105,8 @@ public abstract class AbstractRocksDBState<K, N, V> implements InternalKvState<K
         this.dataOutputView = new DataOutputSerializer(128);
         this.dataInputView = new DataInputDeserializer();
         this.sharedKeyNamespaceSerializer = backend.getSharedRocksKeyBuilder();
+
+        this.cache = new RocksDBStateCache();
     }
 
     // ------------------------------------------------------------------------
