@@ -1,9 +1,9 @@
 package org.apache.flink.contrib.streaming.state.cache;
 
 /** Javadoc for RocksDBStateCache. */
-public class RocksDBStateCache<V> {
+public class RocksDBStateCache<K, V> {
 
-    private AbstractCacheManager<V> cacheManager;
+    private AbstractCacheManager<K, V> cacheManager;
 
     private final int defaultSize = 10;
 
@@ -16,17 +16,17 @@ public class RocksDBStateCache<V> {
     }
 
     // gets value related to key
-    public boolean has(byte[] key) {
+    public boolean has(K key) {
         return cacheManager.has(key);
     }
 
     // gets value related to key
-    public V get(byte[] key) {
+    public V get(K key) {
         return cacheManager.get(key);
     }
 
     // puts kv pair, returns evicted pair
-    public void update(byte[] key, V value) {
+    public void update(K key, V value) {
         cacheManager.update(key, value);
     }
 
