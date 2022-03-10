@@ -4,29 +4,29 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /** Javadoc for LRUCacheManager. */
-public class LRUCacheManager<V> extends AbstractCacheManager<V> {
+public class LRUCacheManager<K, V> extends AbstractCacheManager<K, V> {
 
-    private LinkedHashMap<byte[], V> storage;
+    private LinkedHashMap<K, V> storage;
 
     public LRUCacheManager(int size) {
         super(size);
-        storage = new LinkedHashMap<byte[], V>(size, 0.75f, true);
+        storage = new LinkedHashMap<K, V>(size, 0.75f, true);
     }
 
     @Override
-    public boolean has(byte[] key) {
+    public boolean has(K key) {
         return this.storage.containsKey(key);
     }
 
     // assume has already check key exists with hash
     @Override
-    public V get(byte[] key) {
+    public V get(K key) {
         logger.info("--- lru get ---");
         return storage.getOrDefault(key, null);
     }
 
     @Override
-    public void update(byte[] key, V value) {
+    public void update(K key, V value) {
         if (this.storage.size() >= this.size && !this.has(key)) {
             this.evict();
         }
@@ -37,7 +37,7 @@ public class LRUCacheManager<V> extends AbstractCacheManager<V> {
     @Override
     protected void evict() {
         logger.info("--- lru evict ---");
-        Map.Entry<byte[], V> firstEntry = storage.entrySet().iterator().next();
+        Map.Entry<K, V> firstEntry = storage.entrySet().iterator().next();
         this.storage.remove(firstEntry.getKey());
     }
 
