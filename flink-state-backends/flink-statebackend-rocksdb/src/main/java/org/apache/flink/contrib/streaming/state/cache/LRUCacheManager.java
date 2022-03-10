@@ -31,6 +31,8 @@ public class LRUCacheManager<V> extends AbstractCacheManager<V> {
             this.evict();
         }
         logger.info("--- lru update ---");
+        logger.info("key: " + key.toString());
+        logger.info("value: " + value.toString());
         storage.put(key, value);
     }
 
