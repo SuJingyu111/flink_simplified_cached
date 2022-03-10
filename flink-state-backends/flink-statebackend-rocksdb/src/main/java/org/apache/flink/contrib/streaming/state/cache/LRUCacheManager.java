@@ -1,5 +1,6 @@
 package org.apache.flink.contrib.streaming.state.cache;
 
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -31,7 +32,7 @@ public class LRUCacheManager<V> extends AbstractCacheManager<V> {
             this.evict();
         }
         logger.info("--- lru update ---");
-        logger.info("key: " + key.toString());
+        logger.info("key: " + Arrays.toString(key));
         logger.info("value: " + value.toString());
         storage.put(key, value);
     }
