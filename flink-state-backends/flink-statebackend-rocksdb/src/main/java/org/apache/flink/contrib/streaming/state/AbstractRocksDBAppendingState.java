@@ -56,12 +56,17 @@ abstract class AbstractRocksDBAppendingState<K, N, IN, SV, OUT>
 
     SV getInternal(byte[] key) {
         try {
+            if (this.cache.has(key)) {
+                return (SV) this.cache.get(key);
+            }
             byte[] valueBytes = backend.db.get(columnFamily, key);
             if (valueBytes == null) {
                 return null;
             }
             dataInputView.setBuffer(valueBytes);
-            return valueSerializer.deserialize(dataInputView);
+            SV value = valueSerializer.deserialize(dataInputView);
+            this.cache.update(key, value);
+            return value;
         } catch (IOException | RocksDBException e) {
             throw new FlinkRuntimeException("Error while retrieving data from RocksDB", e);
         }
@@ -76,6 +81,7 @@ abstract class AbstractRocksDBAppendingState<K, N, IN, SV, OUT>
         try {
             // write the new value to RocksDB
             backend.db.put(columnFamily, writeOptions, key, getValueBytes(valueToStore));
+            this.cache.update(key, valueToStore);
         } catch (RocksDBException e) {
             throw new FlinkRuntimeException("Error while adding value to RocksDB", e);
         }
