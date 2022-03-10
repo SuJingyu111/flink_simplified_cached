@@ -135,10 +135,7 @@ class RocksDBListState<K, N, V> extends AbstractRocksDBState<K, N, List<V>>
         try {
             byte[] key = serializeCurrentKeyWithGroupAndNamespace();
             backend.db.merge(
-                    columnFamily,
-                    writeOptions,
-                    key,
-                    serializeValue(value, elementSerializer));
+                    columnFamily, writeOptions, key, serializeValue(value, elementSerializer));
             List<V> cacheValue = (List<V>) this.cache.get(key);
             cacheValue.add(value);
             this.cache.update(key, cacheValue);
