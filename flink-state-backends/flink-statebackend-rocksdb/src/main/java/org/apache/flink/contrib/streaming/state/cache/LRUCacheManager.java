@@ -1,6 +1,5 @@
 package org.apache.flink.contrib.streaming.state.cache;
 
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
