@@ -47,7 +47,6 @@ public class LRUCacheManager<K, V> extends AbstractCacheManager<K, V> {
         this.storage.remove(key);
     }
 
-
     @Override
     protected void clear() {
         storage.clear();
