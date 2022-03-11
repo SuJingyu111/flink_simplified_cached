@@ -31,6 +31,7 @@ import org.rocksdb.ColumnFamilyHandle;
 import org.rocksdb.RocksDBException;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * {@link ValueState} implementation that stores state in RocksDB.
@@ -80,8 +81,9 @@ class RocksDBValueState<K, N, V> extends AbstractRocksDBState<K, N, V>
     public V value() {
         try {
             byte[] key = serializeCurrentKeyWithGroupAndNamespace();
-            if (this.cache.has(key)) {
-                return (V) this.cache.get(key);
+            String keyString = Arrays.toString(key);
+            if (this.cache.has(keyString)) {
+                return (V) this.cache.get(keyString);
             }
             byte[] valueBytes =
                     backend.db.get(columnFamily, serializeCurrentKeyWithGroupAndNamespace());
@@ -91,7 +93,7 @@ class RocksDBValueState<K, N, V> extends AbstractRocksDBState<K, N, V>
             }
             dataInputView.setBuffer(valueBytes);
             V value = valueSerializer.deserialize(dataInputView);
-            this.cache.update(key, value);
+            this.cache.update(keyString, value);
             return value;
         } catch (IOException | RocksDBException e) {
             throw new FlinkRuntimeException("Error while retrieving data from RocksDB.", e);
@@ -108,7 +110,8 @@ class RocksDBValueState<K, N, V> extends AbstractRocksDBState<K, N, V>
         try {
             byte[] key = serializeCurrentKeyWithGroupAndNamespace();
             backend.db.put(columnFamily, writeOptions, key, serializeValue(value));
-            this.cache.update(key, value);
+            String keyString = Arrays.toString(key);
+            this.cache.update(keyString, value);
         } catch (Exception e) {
             throw new FlinkRuntimeException("Error while adding data to RocksDB", e);
         }
