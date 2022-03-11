@@ -127,9 +127,10 @@ class RocksDBMapState<K, N, UK, UV> extends AbstractRocksDBState<K, N, Map<UK, U
         }
         byte[] rawValueBytes = backend.db.get(columnFamily, rawKeyBytes);
 
-        UV value = (rawValueBytes == null
-                ? null
-                : deserializeUserValue(dataInputView, rawValueBytes, userValueSerializer));
+        UV value =
+                (rawValueBytes == null
+                        ? null
+                        : deserializeUserValue(dataInputView, rawValueBytes, userValueSerializer));
         this.cache.update(keyString, value);
         return value;
     }
