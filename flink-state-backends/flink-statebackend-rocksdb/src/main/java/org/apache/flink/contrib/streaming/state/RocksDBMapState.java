@@ -121,6 +121,10 @@ class RocksDBMapState<K, N, UK, UV> extends AbstractRocksDBState<K, N, Map<UK, U
     public UV get(UK userKey) throws IOException, RocksDBException {
         byte[] rawKeyBytes =
                 serializeCurrentKeyWithGroupAndNamespacePlusUserKey(userKey, userKeySerializer);
+        String keyString = Arrays.toString(rawKeyBytes);
+        if (this.cache.has(keyString)) {
+            return (UV) this.cache.get(keyString);
+        }
         byte[] rawValueBytes = backend.db.get(columnFamily, rawKeyBytes);
 
         return (rawValueBytes == null
@@ -136,6 +140,8 @@ class RocksDBMapState<K, N, UK, UV> extends AbstractRocksDBState<K, N, Map<UK, U
         byte[] rawValueBytes = serializeValueNullSensitive(userValue, userValueSerializer);
 
         backend.db.put(columnFamily, writeOptions, rawKeyBytes, rawValueBytes);
+        String keyString = Arrays.toString(rawKeyBytes);
+        this.cache.update(keyString, userValue);
     }
 
     @Override
@@ -154,6 +160,8 @@ class RocksDBMapState<K, N, UK, UV> extends AbstractRocksDBState<K, N, Map<UK, U
                 byte[] rawValueBytes =
                         serializeValueNullSensitive(entry.getValue(), userValueSerializer);
                 writeBatchWrapper.put(columnFamily, rawKeyBytes, rawValueBytes);
+                String keyString = Arrays.toString(rawKeyBytes);
+                this.cache.update(keyString, entry.getValue());
             }
         }
     }

@@ -5,7 +5,7 @@ public class RocksDBStateCache<K, V> {
 
     private AbstractCacheManager<K, V> cacheManager;
 
-    private final int defaultSize = 10;
+    private final int defaultSize = 3;
 
     public RocksDBStateCache() {
         this.cacheManager = CacheManagerFactory.getDefaultCacheManager(defaultSize);

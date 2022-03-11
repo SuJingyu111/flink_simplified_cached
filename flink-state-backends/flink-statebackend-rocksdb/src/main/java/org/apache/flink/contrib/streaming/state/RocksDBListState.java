@@ -36,6 +36,8 @@ import org.apache.flink.util.StateMigrationException;
 
 import org.rocksdb.ColumnFamilyHandle;
 import org.rocksdb.RocksDBException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 
@@ -43,6 +45,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import static org.apache.flink.runtime.state.StateSnapshotTransformer.CollectionStateSnapshotTransformer.TransformStrategy.STOP_ON_FIRST_INCLUDED;
@@ -65,6 +68,8 @@ class RocksDBListState<K, N, V> extends AbstractRocksDBState<K, N, List<V>>
     private final TypeSerializer<V> elementSerializer;
 
     private final ListDelimitedSerializer listSerializer;
+
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     /** Separator of StringAppendTestOperator in RocksDB. */
     private static final byte DELIMITER = ',';
@@ -116,12 +121,13 @@ class RocksDBListState<K, N, V> extends AbstractRocksDBState<K, N, List<V>>
     public List<V> getInternal() {
         try {
             byte[] key = serializeCurrentKeyWithGroupAndNamespace();
-            if (this.cache.has(key)) {
-                return (List<V>) this.cache.get(key);
+            String keyString = Arrays.toString(key);
+            if (this.cache.has(keyString)) {
+                return (List<V>) this.cache.get(keyString);
             }
             byte[] valueBytes = backend.db.get(columnFamily, key);
             List<V> value = listSerializer.deserializeList(valueBytes, elementSerializer);
-            this.cache.update(key, value);
+            this.cache.update(keyString, value);
             return value;
         } catch (RocksDBException e) {
             throw new FlinkRuntimeException("Error while retrieving data from RocksDB", e);
@@ -134,11 +140,15 @@ class RocksDBListState<K, N, V> extends AbstractRocksDBState<K, N, List<V>>
 
         try {
             byte[] key = serializeCurrentKeyWithGroupAndNamespace();
+            String keyString = Arrays.toString(key);
             backend.db.merge(
                     columnFamily, writeOptions, key, serializeValue(value, elementSerializer));
-            List<V> cacheValue = (List<V>) this.cache.get(key);
+            List<V> cacheValue = (List<V>) this.cache.get(keyString);
+            if(cacheValue==null){
+                cacheValue = new ArrayList<>();
+            }
             cacheValue.add(value);
-            this.cache.update(key, cacheValue);
+            this.cache.update(keyString, cacheValue);
         } catch (Exception e) {
             throw new FlinkRuntimeException("Error while adding data to RocksDB", e);
         }
@@ -186,12 +196,13 @@ class RocksDBListState<K, N, V> extends AbstractRocksDBState<K, N, List<V>>
         if (!values.isEmpty()) {
             try {
                 byte[] key = serializeCurrentKeyWithGroupAndNamespace();
+                String keyString = Arrays.toString(key);
                 backend.db.put(
                         columnFamily,
                         writeOptions,
                         key,
                         listSerializer.serializeList(values, elementSerializer));
-                this.cache.update(key, values);
+                this.cache.update(keyString, values);
             } catch (IOException | RocksDBException e) {
                 throw new FlinkRuntimeException("Error while updating data to RocksDB", e);
             }
@@ -207,6 +218,7 @@ class RocksDBListState<K, N, V> extends AbstractRocksDBState<K, N, List<V>>
         if (!values.isEmpty()) {
             try {
                 byte[] key = serializeCurrentKeyWithGroupAndNamespace();
+                String keyString = Arrays.toString(key);
                 backend.db.merge(
                         columnFamily,
                         writeOptions,
@@ -216,7 +228,7 @@ class RocksDBListState<K, N, V> extends AbstractRocksDBState<K, N, List<V>>
                 for (V v : values) {
                     cacheValue.add(v);
                 }
-                this.cache.update(key, cacheValue);
+                this.cache.update(keyString, cacheValue);
             } catch (IOException | RocksDBException e) {
                 throw new FlinkRuntimeException("Error while updating data to RocksDB", e);
             }
