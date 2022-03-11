@@ -26,6 +26,7 @@ import org.rocksdb.ColumnFamilyHandle;
 import org.rocksdb.RocksDBException;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 abstract class AbstractRocksDBAppendingState<K, N, IN, SV, OUT>
         extends AbstractRocksDBState<K, N, SV>
@@ -56,8 +57,9 @@ abstract class AbstractRocksDBAppendingState<K, N, IN, SV, OUT>
 
     SV getInternal(byte[] key) {
         try {
+            String keyString = Arrays.toString(key);
             if (this.cache.has(key)) {
-                return (SV) this.cache.get(key);
+                return (SV) this.cache.get(keyString);
             }
             byte[] valueBytes = backend.db.get(columnFamily, key);
             if (valueBytes == null) {
@@ -65,7 +67,7 @@ abstract class AbstractRocksDBAppendingState<K, N, IN, SV, OUT>
             }
             dataInputView.setBuffer(valueBytes);
             SV value = valueSerializer.deserialize(dataInputView);
-            this.cache.update(key, value);
+            this.cache.update(keyString, value);
             return value;
         } catch (IOException | RocksDBException e) {
             throw new FlinkRuntimeException("Error while retrieving data from RocksDB", e);
@@ -79,9 +81,10 @@ abstract class AbstractRocksDBAppendingState<K, N, IN, SV, OUT>
 
     void updateInternal(byte[] key, SV valueToStore) {
         try {
+            String keyString = Arrays.toString(key);
             // write the new value to RocksDB
             backend.db.put(columnFamily, writeOptions, key, getValueBytes(valueToStore));
-            this.cache.update(key, valueToStore);
+            this.cache.update(keyString, valueToStore);
         } catch (RocksDBException e) {
             throw new FlinkRuntimeException("Error while adding value to RocksDB", e);
         }

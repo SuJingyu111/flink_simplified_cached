@@ -27,6 +27,8 @@ public abstract class AbstractCacheManager<K, V> {
     // eviction policy here.
     protected abstract void evict();
 
+    protected abstract void remove(K key);
+
     // Clears the cache
     protected abstract void clear();
 }

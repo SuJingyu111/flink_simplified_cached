@@ -50,6 +50,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import static org.apache.flink.util.Preconditions.checkArgument;
@@ -121,11 +122,17 @@ class RocksDBMapState<K, N, UK, UV> extends AbstractRocksDBState<K, N, Map<UK, U
     public UV get(UK userKey) throws IOException, RocksDBException {
         byte[] rawKeyBytes =
                 serializeCurrentKeyWithGroupAndNamespacePlusUserKey(userKey, userKeySerializer);
+        String keyString = Arrays.toString(rawKeyBytes);
+        if (this.cache.has(keyString)) {
+            return (UV) this.cache.get(keyString);
+        }
         byte[] rawValueBytes = backend.db.get(columnFamily, rawKeyBytes);
 
-        return (rawValueBytes == null
+        UV value = (rawValueBytes == null
                 ? null
                 : deserializeUserValue(dataInputView, rawValueBytes, userValueSerializer));
+        this.cache.update(keyString, value);
+        return value;
     }
 
     @Override
@@ -133,7 +140,9 @@ class RocksDBMapState<K, N, UK, UV> extends AbstractRocksDBState<K, N, Map<UK, U
 
         byte[] rawKeyBytes =
                 serializeCurrentKeyWithGroupAndNamespacePlusUserKey(userKey, userKeySerializer);
+        String keyString = Arrays.toString(rawKeyBytes);
         byte[] rawValueBytes = serializeValueNullSensitive(userValue, userValueSerializer);
+        this.cache.update(keyString, userValue);
 
         backend.db.put(columnFamily, writeOptions, rawKeyBytes, rawValueBytes);
     }
@@ -151,8 +160,10 @@ class RocksDBMapState<K, N, UK, UV> extends AbstractRocksDBState<K, N, Map<UK, U
                 byte[] rawKeyBytes =
                         serializeCurrentKeyWithGroupAndNamespacePlusUserKey(
                                 entry.getKey(), userKeySerializer);
+                String keyString = Arrays.toString(rawKeyBytes);
                 byte[] rawValueBytes =
                         serializeValueNullSensitive(entry.getValue(), userValueSerializer);
+                this.cache.update(keyString, entry.getValue());
                 writeBatchWrapper.put(columnFamily, rawKeyBytes, rawValueBytes);
             }
         }
@@ -162,7 +173,8 @@ class RocksDBMapState<K, N, UK, UV> extends AbstractRocksDBState<K, N, Map<UK, U
     public void remove(UK userKey) throws IOException, RocksDBException {
         byte[] rawKeyBytes =
                 serializeCurrentKeyWithGroupAndNamespacePlusUserKey(userKey, userKeySerializer);
-
+        String keyString = Arrays.toString(rawKeyBytes);
+        this.cache.remove(keyString);
         backend.db.delete(columnFamily, writeOptions, rawKeyBytes);
     }
 
@@ -170,6 +182,10 @@ class RocksDBMapState<K, N, UK, UV> extends AbstractRocksDBState<K, N, Map<UK, U
     public boolean contains(UK userKey) throws IOException, RocksDBException {
         byte[] rawKeyBytes =
                 serializeCurrentKeyWithGroupAndNamespacePlusUserKey(userKey, userKeySerializer);
+        String keyString = Arrays.toString(rawKeyBytes);
+        if (this.cache.has(keyString)) {
+            return true;
+        }
         byte[] rawValueBytes = backend.db.get(columnFamily, rawKeyBytes);
 
         return (rawValueBytes != null);
