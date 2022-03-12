@@ -10,8 +10,12 @@ public abstract class AbstractCacheManager<K, V> {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
+    public int hitCount, totalCount;
+
     public AbstractCacheManager(int size) {
         this.size = size;
+        this.hitCount  = 0;
+        this.totalCount = 0;
     }
 
     // determine if such key exist in the cache
@@ -31,4 +35,8 @@ public abstract class AbstractCacheManager<K, V> {
 
     // Clears the cache
     protected abstract void clear();
+
+    public float getHitRate() {
+        return ((float) this.hitCount)/((float) this.totalCount);
+    }
 }

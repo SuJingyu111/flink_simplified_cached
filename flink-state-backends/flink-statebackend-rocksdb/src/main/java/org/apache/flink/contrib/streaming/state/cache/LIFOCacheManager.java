@@ -19,7 +19,13 @@ public class LIFOCacheManager<K, V> extends AbstractCacheManager<K, V> {
     @Override
     public boolean has(K key) {
         logger.info(key.toString());
-        return this.storage.containsKey(key);
+        boolean hit = false;
+        if (this.storage.containsKey(key)) {
+            this.hitCount++;
+            hit = true;
+        }
+        this.totalCount++;
+        return hit;
     }
 
     // assume has already check key exists with hash
