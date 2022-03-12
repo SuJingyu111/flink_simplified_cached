@@ -14,7 +14,7 @@ public abstract class AbstractCacheManager<K, V> {
 
     public AbstractCacheManager(int size) {
         this.size = size;
-        this.hitCount  = 0;
+        this.hitCount = 0;
         this.totalCount = 0;
     }
 
@@ -37,6 +37,6 @@ public abstract class AbstractCacheManager<K, V> {
     protected abstract void clear();
 
     public float getHitRate() {
-        return ((float) this.hitCount)/((float) this.totalCount);
+        return ((float) this.hitCount) / ((float) this.totalCount);
     }
 }
