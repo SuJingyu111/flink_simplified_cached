@@ -25,6 +25,11 @@ public class RocksDBStateCache<K, V> {
         return cacheManager.get(key);
     }
 
+    // evict value with such key
+    public void remove(K key) {
+        cacheManager.remove(key);
+    }
+
     // puts kv pair, returns evicted pair
     public void update(K key, V value) {
         cacheManager.update(key, value);

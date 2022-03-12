@@ -81,6 +81,7 @@ abstract class AbstractRocksDBAppendingState<K, N, IN, SV, OUT>
 
     void updateInternal(byte[] key, SV valueToStore) {
         try {
+            String keyString = Arrays.toString(key);
             // write the new value to RocksDB
             backend.db.put(columnFamily, writeOptions, key, getValueBytes(valueToStore));
             String keyString = Arrays.toString(key);

@@ -224,7 +224,7 @@ class RocksDBListState<K, N, V> extends AbstractRocksDBState<K, N, List<V>>
                         writeOptions,
                         key,
                         listSerializer.serializeList(values, elementSerializer));
-                List<V> cacheValue = (List<V>) this.cache.get(key);
+                List<V> cacheValue = (List<V>) this.cache.get(keyString);
                 for (V v : values) {
                     cacheValue.add(v);
                 }
