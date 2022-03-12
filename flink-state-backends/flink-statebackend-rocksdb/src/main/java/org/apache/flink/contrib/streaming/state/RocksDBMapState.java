@@ -145,6 +145,8 @@ class RocksDBMapState<K, N, UK, UV> extends AbstractRocksDBState<K, N, Map<UK, U
         this.cache.update(keyString, userValue);
 
         backend.db.put(columnFamily, writeOptions, rawKeyBytes, rawValueBytes);
+        String keyString = Arrays.toString(rawKeyBytes);
+        this.cache.update(keyString, userValue);
     }
 
     @Override
@@ -165,6 +167,8 @@ class RocksDBMapState<K, N, UK, UV> extends AbstractRocksDBState<K, N, Map<UK, U
                         serializeValueNullSensitive(entry.getValue(), userValueSerializer);
                 this.cache.update(keyString, entry.getValue());
                 writeBatchWrapper.put(columnFamily, rawKeyBytes, rawValueBytes);
+                String keyString = Arrays.toString(rawKeyBytes);
+                this.cache.update(keyString, entry.getValue());
             }
         }
     }
