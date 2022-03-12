@@ -56,8 +56,9 @@ public class LFUCacheManager<K, V> extends AbstractCacheManager<K, V> {
                 minFrequency += 1;
             }
         }
+        entry.freq += 1;
         LinkedList<Entry> list = freqEntryListMap.getOrDefault(freq + 1, new LinkedList<Entry>());
-        list.offerFirst(new Entry(key, val, freq));
+        list.offerFirst(entry);
         freqEntryListMap.put(freq + 1, list);
         keyEntryMap.put(key, freqEntryListMap.get(freq + 1).peekFirst());
         return val;
@@ -73,17 +74,19 @@ public class LFUCacheManager<K, V> extends AbstractCacheManager<K, V> {
                 evict();
             }
             LinkedList<Entry> list = freqEntryListMap.getOrDefault(1L, new LinkedList<Entry>());
-            list.offerFirst(new Entry(key, value, 1));
+            Entry newEntry = new Entry(key, value, 1);
+            list.offerFirst(newEntry);
             freqEntryListMap.put(1L, list);
-            keyEntryMap.put(key, freqEntryListMap.get(1L).peekFirst());
+            keyEntryMap.put(key, newEntry);
             minFrequency = 1;
         } else {
             Entry entry = keyEntryMap.get(key);
             long freq = entry.freq;
             LinkedList<Entry> list = getUpdatedFreqEntryList(entry);
-            list.offerFirst(new Entry(key, value, freq + 1));
+            entry.freq += 1;
+            list.offerFirst(entry);
             freqEntryListMap.put(freq + 1, list);
-            keyEntryMap.put(key, freqEntryListMap.get(freq + 1).peekFirst());
+            keyEntryMap.put(key, entry);
         }
     }
 
