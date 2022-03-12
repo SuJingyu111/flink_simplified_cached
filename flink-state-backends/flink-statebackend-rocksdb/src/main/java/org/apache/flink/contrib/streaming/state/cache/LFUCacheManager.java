@@ -1,10 +1,7 @@
 package org.apache.flink.contrib.streaming.state.cache;
 
-import org.apache.flink.streaming.runtime.operators.windowing.KeyMap;
-
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 
 public class LFUCacheManager <K, V> extends AbstractCacheManager<K, V>{
 
