@@ -86,7 +86,7 @@ public class ClockCacheManager<K, V> extends AbstractCacheManager<K, V> {
     @Override
     protected void remove(K key) {
         logger.info("--- clock cache remove ---");
-        if(storage.containsKey(key)) {
+        if (storage.containsKey(key)) {
             logger.debug("find key {}, remove", key);
             CacheSlot<K, V> slot = storage.get(key);
             slot.useBit = 0;

@@ -94,6 +94,30 @@ public class LFUCacheManager<K, V> extends AbstractCacheManager<K, V> {
     }
 
     @Override
+    protected void remove(K key) {
+        if (!keyEntryMap.containsKey(key)) {
+            return;
+        } else {
+            Entry removedEntry = keyEntryMap.remove(key);
+            long removedFreq = removedEntry.freq;
+            LinkedList<Entry> entryList = freqEntryListMap.get(removedFreq);
+            entryList.remove(removedEntry);
+            if (entryList.size() == 0) {
+                freqEntryListMap.remove(removedEntry.freq);
+                if (removedFreq == minFrequency) {
+                    long nextLeastFreq = Long.MAX_VALUE;
+                    for (long thisFreq : freqEntryListMap.keySet()) {
+                        if (thisFreq < nextLeastFreq) {
+                            nextLeastFreq = thisFreq;
+                        }
+                    }
+                    minFrequency = nextLeastFreq;
+                }
+            }
+        }
+    }
+
+    @Override
     protected void clear() {
         keyEntryMap.clear();
         freqEntryListMap.clear();

@@ -84,7 +84,6 @@ abstract class AbstractRocksDBAppendingState<K, N, IN, SV, OUT>
             String keyString = Arrays.toString(key);
             // write the new value to RocksDB
             backend.db.put(columnFamily, writeOptions, key, getValueBytes(valueToStore));
-            String keyString = Arrays.toString(key);
             this.cache.update(keyString, valueToStore);
         } catch (RocksDBException e) {
             throw new FlinkRuntimeException("Error while adding value to RocksDB", e);
