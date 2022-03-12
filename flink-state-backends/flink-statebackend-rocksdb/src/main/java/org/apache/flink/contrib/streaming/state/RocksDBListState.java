@@ -45,7 +45,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import static org.apache.flink.runtime.state.StateSnapshotTransformer.CollectionStateSnapshotTransformer.TransformStrategy.STOP_ON_FIRST_INCLUDED;
@@ -144,7 +143,7 @@ class RocksDBListState<K, N, V> extends AbstractRocksDBState<K, N, List<V>>
             backend.db.merge(
                     columnFamily, writeOptions, key, serializeValue(value, elementSerializer));
             List<V> cacheValue = (List<V>) this.cache.get(keyString);
-            if(cacheValue==null){
+            if (cacheValue == null) {
                 cacheValue = new ArrayList<>();
             }
             cacheValue.add(value);
