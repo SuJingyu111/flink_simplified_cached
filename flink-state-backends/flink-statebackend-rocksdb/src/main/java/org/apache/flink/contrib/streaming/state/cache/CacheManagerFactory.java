@@ -5,6 +5,6 @@ public class CacheManagerFactory {
 
     // Gets Default Cachemanager of the cache
     public static AbstractCacheManager getDefaultCacheManager(int size) {
-        return new LIFOCacheManager(size);
+        return new ClockCacheManager(size);
     }
 }

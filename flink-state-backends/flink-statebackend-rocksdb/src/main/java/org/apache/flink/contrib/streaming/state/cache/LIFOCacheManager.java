@@ -41,8 +41,10 @@ public class LIFOCacheManager<K, V> extends AbstractCacheManager<K, V> {
             this.evict();
         }
         logger.info("--- lifo update ---");
+        if (!this.has(key)) {
+            stack.add(key);
+        }
         storage.put(key, value);
-        stack.add(key);
     }
 
     @Override
