@@ -46,6 +46,12 @@ public class LIFOCacheManager<K, V> extends AbstractCacheManager<K, V> {
     }
 
     @Override
+    protected void remove(K key) {
+        logger.info("--- lru remove ---");
+        this.storage.remove(key);
+    }
+
+    @Override
     protected void clear() {
         storage.clear();
     }
