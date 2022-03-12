@@ -37,6 +37,9 @@ public abstract class AbstractCacheManager<K, V> {
     protected abstract void clear();
 
     public float getHitRate() {
+        if (this.totalCount == 0) {
+            return 0;
+        }
         return ((float) this.hitCount) / ((float) this.totalCount);
     }
 }

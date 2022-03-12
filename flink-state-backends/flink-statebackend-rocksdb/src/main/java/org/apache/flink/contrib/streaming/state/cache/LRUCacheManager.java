@@ -15,7 +15,14 @@ public class LRUCacheManager<K, V> extends AbstractCacheManager<K, V> {
 
     @Override
     public boolean has(K key) {
-        return this.storage.containsKey(key);
+        logger.info(key.toString());
+        boolean hit = false;
+        if (this.storage.containsKey(key)) {
+            this.hitCount++;
+            hit = true;
+        }
+        this.totalCount++;
+        return hit;
     }
 
     // assume has already check key exists with hash
