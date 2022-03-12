@@ -58,7 +58,7 @@ abstract class AbstractRocksDBAppendingState<K, N, IN, SV, OUT>
     SV getInternal(byte[] key) {
         try {
             String keyString = Arrays.toString(key);
-            if (this.cache.has(key)) {
+            if (this.cache.has(keyString)) {
                 return (SV) this.cache.get(keyString);
             }
             byte[] valueBytes = backend.db.get(columnFamily, key);
@@ -84,6 +84,7 @@ abstract class AbstractRocksDBAppendingState<K, N, IN, SV, OUT>
             String keyString = Arrays.toString(key);
             // write the new value to RocksDB
             backend.db.put(columnFamily, writeOptions, key, getValueBytes(valueToStore));
+            String keyString = Arrays.toString(key);
             this.cache.update(keyString, valueToStore);
         } catch (RocksDBException e) {
             throw new FlinkRuntimeException("Error while adding value to RocksDB", e);

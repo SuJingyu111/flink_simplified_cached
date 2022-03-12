@@ -36,6 +36,8 @@ import org.apache.flink.util.StateMigrationException;
 
 import org.rocksdb.ColumnFamilyHandle;
 import org.rocksdb.RocksDBException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 
@@ -43,6 +45,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import static org.apache.flink.runtime.state.StateSnapshotTransformer.CollectionStateSnapshotTransformer.TransformStrategy.STOP_ON_FIRST_INCLUDED;
@@ -65,6 +68,8 @@ class RocksDBListState<K, N, V> extends AbstractRocksDBState<K, N, List<V>>
     private final TypeSerializer<V> elementSerializer;
 
     private final ListDelimitedSerializer listSerializer;
+
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     /** Separator of StringAppendTestOperator in RocksDB. */
     private static final byte DELIMITER = ',';
@@ -138,7 +143,10 @@ class RocksDBListState<K, N, V> extends AbstractRocksDBState<K, N, List<V>>
             String keyString = Arrays.toString(key);
             backend.db.merge(
                     columnFamily, writeOptions, key, serializeValue(value, elementSerializer));
-            List<V> cacheValue = (List<V>) this.cache.get(key);
+            List<V> cacheValue = (List<V>) this.cache.get(keyString);
+            if(cacheValue==null){
+                cacheValue = new ArrayList<>();
+            }
             cacheValue.add(value);
             this.cache.update(keyString, cacheValue);
         } catch (Exception e) {
