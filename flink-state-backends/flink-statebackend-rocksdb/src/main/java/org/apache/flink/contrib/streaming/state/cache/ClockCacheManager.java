@@ -24,7 +24,12 @@ public class ClockCacheManager<K, V> extends AbstractCacheManager<K, V> {
 
     @Override
     public boolean has(K key) {
-        return this.storage.containsKey(key);
+        boolean hit = this.storage.containsKey(key);
+        if (hit) {
+            this.hitCount += 1;
+        }
+        this.totalCount += 1;
+        return hit;
     }
 
     // assume has already check key exists with hash
