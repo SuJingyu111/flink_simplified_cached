@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 /** Javadoc for LFUCacheManager. */
-public class LFUCacheManager <K, V> extends AbstractCacheManager<K, V>{
+public class LFUCacheManager<K, V> extends AbstractCacheManager<K, V> {
 
     /** Javadoc for a data entry. */
     protected class Entry {
@@ -19,7 +19,7 @@ public class LFUCacheManager <K, V> extends AbstractCacheManager<K, V>{
         }
     }
 
-    //todo: clear freq counter after a time interval
+    // todo: clear freq counter after a time interval
     private long minFrequency;
     private HashMap<K, Entry> keyEntryMap;
     private HashMap<Long, LinkedList<Entry>> freqEntryListMap;
