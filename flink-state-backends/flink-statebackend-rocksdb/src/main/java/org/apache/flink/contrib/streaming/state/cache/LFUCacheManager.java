@@ -3,8 +3,10 @@ package org.apache.flink.contrib.streaming.state.cache;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+/** Javadoc for LFUCacheManager. */
 public class LFUCacheManager <K, V> extends AbstractCacheManager<K, V>{
 
+    /** Javadoc for a data entry. */
     protected class Entry {
         K key;
         V val;
@@ -17,6 +19,7 @@ public class LFUCacheManager <K, V> extends AbstractCacheManager<K, V>{
         }
     }
 
+    //todo: clear freq counter after a time interval
     private long minFrequency;
     private HashMap<K, Entry> keyEntryMap;
     private HashMap<Long, LinkedList<Entry>> freqEntryListMap;
