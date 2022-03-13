@@ -33,6 +33,7 @@ public class LFUCacheManager<K, V> extends AbstractCacheManager<K, V> {
 
     @Override
     public boolean has(K key) {
+        printRatio();
         this.totalCount++;
         if (keyEntryMap.containsKey(key)) {
             this.hitCount++;

@@ -36,6 +36,10 @@ public abstract class AbstractCacheManager<K, V> {
     // Clears the cache
     protected abstract void clear();
 
+    public void printRatio() {
+        logger.info("Current Hit Rate: " + getHitRate());
+    }
+
     public float getHitRate() {
         if (this.totalCount == 0) {
             return 0;

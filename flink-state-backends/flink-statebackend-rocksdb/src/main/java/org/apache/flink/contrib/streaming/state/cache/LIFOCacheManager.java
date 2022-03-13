@@ -18,7 +18,7 @@ public class LIFOCacheManager<K, V> extends AbstractCacheManager<K, V> {
 
     @Override
     public boolean has(K key) {
-        logger.info(key.toString());
+        // printRatio();
         boolean hit = false;
         if (this.storage.containsKey(key)) {
             this.hitCount++;
@@ -31,7 +31,7 @@ public class LIFOCacheManager<K, V> extends AbstractCacheManager<K, V> {
     // assume has already check key exists with hash
     @Override
     public V get(K key) {
-        logger.info("--- lifo get ---");
+        // logger.info("--- lifo get ---");
         return storage.getOrDefault(key, null);
     }
 
@@ -40,7 +40,7 @@ public class LIFOCacheManager<K, V> extends AbstractCacheManager<K, V> {
         if (this.storage.size() >= this.size && !this.has(key)) {
             this.evict();
         }
-        logger.info("--- lifo update ---");
+        // logger.info("--- lifo update ---");
         if (!this.has(key)) {
             stack.add(key);
         }
@@ -49,13 +49,13 @@ public class LIFOCacheManager<K, V> extends AbstractCacheManager<K, V> {
 
     @Override
     protected void evict() {
-        logger.info("--- lifo evict ---");
+        // logger.info("--- lifo evict ---");
         this.storage.remove(stack.pop());
     }
 
     @Override
     protected void remove(K key) {
-        logger.info("--- lru remove ---");
+        // logger.info("--- lru remove ---");
         this.storage.remove(key);
     }
 
