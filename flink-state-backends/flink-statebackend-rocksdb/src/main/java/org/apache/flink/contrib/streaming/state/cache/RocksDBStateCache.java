@@ -1,5 +1,7 @@
 package org.apache.flink.contrib.streaming.state.cache;
 
+import org.apache.commons.math3.util.Pair;
+
 /** Javadoc for RocksDBStateCache. */
 public class RocksDBStateCache<K, V> {
 
@@ -31,8 +33,8 @@ public class RocksDBStateCache<K, V> {
     }
 
     // puts kv pair, returns evicted pair
-    public void update(K key, V value) {
-        cacheManager.update(key, value);
+    public Pair<K, V> update(K key, V value) {
+        return cacheManager.update(key, value);
     }
 
     public void clear() {}

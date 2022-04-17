@@ -1,5 +1,7 @@
 package org.apache.flink.contrib.streaming.state.cache;
 
+import org.apache.commons.math3.util.Pair;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -66,13 +68,14 @@ public class LFUCacheManager<K, V> extends AbstractCacheManager<K, V> {
     }
 
     @Override
-    public void update(K key, V value) {
+    public Pair<K, V> update(K key, V value) {
         if (size == 0) {
-            return;
+            return null;
         }
+        Pair<K, V> evictedKV = null;
         if (!keyEntryMap.containsKey(key)) {
             if (keyEntryMap.size() == size) {
-                evict();
+                evictedKV = evict();
             }
             LinkedList<Entry> list = freqEntryListMap.getOrDefault(1L, new LinkedList<Entry>());
             Entry newEntry = new Entry(key, value, 1);
@@ -89,17 +92,21 @@ public class LFUCacheManager<K, V> extends AbstractCacheManager<K, V> {
             freqEntryListMap.put(freq + 1, list);
             keyEntryMap.put(key, entry);
         }
+        return evictedKV;
     }
 
     @Override
-    protected void evict() {
+    protected Pair<K, V> evict() {
         Entry entry = freqEntryListMap.get(minFrequency).peekLast();
         assert entry != null;
-        keyEntryMap.remove(entry.key);
+        K keyToRemove = entry.key;
+        Entry removeEntry = keyEntryMap.get(keyToRemove);
+        keyEntryMap.remove(keyToRemove);
         freqEntryListMap.get(minFrequency).pollLast();
         if (freqEntryListMap.get(minFrequency).size() == 0) {
             freqEntryListMap.remove(minFrequency);
         }
+        return new Pair<K, V>(removeEntry.key, removeEntry.val);
     }
 
     @Override

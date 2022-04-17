@@ -1,5 +1,6 @@
 package org.apache.flink.contrib.streaming.state.cache;
 
+import org.apache.commons.math3.util.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,11 +26,11 @@ public abstract class AbstractCacheManager<K, V> {
     public abstract V get(K key);
 
     // puts kv pair into cache, does not need to talk to backend
-    public abstract void update(K key, V value);
+    public abstract Pair<K, V> update(K key, V value);
 
     // private function to evict kv pair when exceed preset size. Need to be overridden. Implement
     // eviction policy here.
-    protected abstract void evict();
+    protected abstract Pair<K, V> evict();
 
     protected abstract void remove(K key);
 

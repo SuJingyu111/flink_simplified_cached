@@ -1,5 +1,9 @@
 package org.apache.flink.contrib.streaming.state.cache;
 
+import org.apache.commons.math3.util.Pair;
+
+import scala.xml.Null;
+
 import java.util.HashMap;
 
 /**
@@ -47,7 +51,7 @@ public class ClockCacheManager<K, V> extends AbstractCacheManager<K, V> {
     }
 
     @Override
-    public void update(K key, V value) {
+    public Pair<K, V> update(K key, V value) {
         // logger.info("--- clock cache update ---");
         // if already contains the key, just update
         if (has(key)) {
@@ -56,23 +60,24 @@ public class ClockCacheManager<K, V> extends AbstractCacheManager<K, V> {
             CacheSlot<K, V> slot = storage.get(key);
             slot.slotValue = value;
             slot.useBit = 1;
-            return;
+            return null;
         }
         // call evict() to move clock hand to empty page
         // not necessary delete a record
         //        logger.debug("key: {} not in cache, find slot to append", key);
         // logger.info("key: {} not in cache, find slot to append", key);
-        evict();
+        Pair<K, V> evictedKV = evict();
         // update clock hand info
         clockHand.slotKey = key;
         clockHand.slotValue = value;
         clockHand.useBit = 1;
         // put new record into map
         storage.put(key, clockHand);
+        return evictedKV;
     }
 
     @Override
-    protected void evict() {
+    protected Pair<K, V> evict() {
         // logger.info("--- clock cache evict ---");
         while (clockHand.useBit == 1) {
             clockHand.useBit = 0;
@@ -84,8 +89,12 @@ public class ClockCacheManager<K, V> extends AbstractCacheManager<K, V> {
             //            logger.debug("delete key: {} from cache", clockHand.slotKey);
             // logger.info("delete key: {} from cache", clockHand.slotKey);
             // Arrays.toString(clockHand.slotKey));
+            Pair<K, V> evictedKV = new Pair<K, V>(clockHand.slotKey,
+                    (V) storage.get(clockHand.slotKey));
             storage.remove(clockHand.slotKey);
+            return evictedKV;
         }
+        return null;
     }
 
     @Override
