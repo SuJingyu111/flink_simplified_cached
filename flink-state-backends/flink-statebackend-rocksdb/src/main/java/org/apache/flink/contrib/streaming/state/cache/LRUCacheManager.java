@@ -15,7 +15,7 @@ public class LRUCacheManager<K, V> extends AbstractCacheManager<K, V> {
 
     @Override
     public boolean has(K key) {
-        logger.info(key.toString());
+        // printRatio();
         boolean hit = false;
         if (this.storage.containsKey(key)) {
             this.hitCount++;

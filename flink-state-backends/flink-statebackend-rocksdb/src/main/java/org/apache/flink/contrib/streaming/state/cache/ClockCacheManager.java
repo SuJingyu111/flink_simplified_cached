@@ -24,6 +24,7 @@ public class ClockCacheManager<K, V> extends AbstractCacheManager<K, V> {
 
     @Override
     public boolean has(K key) {
+        printRatio();
         boolean hit = this.storage.containsKey(key);
         if (hit) {
             this.hitCount += 1;
@@ -35,11 +36,10 @@ public class ClockCacheManager<K, V> extends AbstractCacheManager<K, V> {
     // assume has already check key exists with hash
     @Override
     public V get(K key) {
-        logger.info("--- clock cache get ---");
+        // logger.info("--- clock cache get ---");
         CacheSlot<K, V> slot = storage.getOrDefault(key, null);
         if (slot == null) {
-            //            logger.debug("key: {} not in cache", key);
-            logger.info("key: {} not in cache", key);
+            // logger.info("key: {} not in cache", key);
             return null;
         }
         slot.useBit = 1; // set use bit to 1 when access the slot
@@ -48,11 +48,11 @@ public class ClockCacheManager<K, V> extends AbstractCacheManager<K, V> {
 
     @Override
     public void update(K key, V value) {
-        logger.info("--- clock cache update ---");
+        // logger.info("--- clock cache update ---");
         // if already contains the key, just update
         if (has(key)) {
             //            logger.debug("key: {} already in cache, update", key);
-            logger.info("key: {} already in cache, update", key);
+            // logger.info("key: {} already in cache, update", key);
             CacheSlot<K, V> slot = storage.get(key);
             slot.slotValue = value;
             slot.useBit = 1;
@@ -84,7 +84,7 @@ public class ClockCacheManager<K, V> extends AbstractCacheManager<K, V> {
         // delete from map only if current slot has another record
         if (clockHand.slotKey != null) {
             //            logger.debug("delete key: {} from cache", clockHand.slotKey);
-            logger.info("delete key: {} from cache", clockHand.slotKey);
+            // logger.info("delete key: {} from cache", clockHand.slotKey);
             // Arrays.toString(clockHand.slotKey));
             storage.remove(clockHand.slotKey);
         }
@@ -92,9 +92,9 @@ public class ClockCacheManager<K, V> extends AbstractCacheManager<K, V> {
 
     @Override
     protected void remove(K key) {
-        logger.info("--- clock cache remove ---");
+        // logger.info("--- clock cache remove ---");
         if (storage.containsKey(key)) {
-            logger.debug("find key {}, remove", key);
+            // logger.debug("find key {}, remove", key);
             CacheSlot<K, V> slot = storage.get(key);
             slot.useBit = 0;
             slot.slotKey = null;
