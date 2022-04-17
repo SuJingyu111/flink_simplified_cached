@@ -58,11 +58,16 @@ public class ClockCacheManager<K, V> extends AbstractCacheManager<K, V> {
             slot.useBit = 1;
             return;
         }
-        // call evict() to move clock hand to empty page
-        // not necessary delete a record
+        // move clock hand to empty page
+        while (clockHand.useBit == 1) {
+            clockHand.useBit = 0;
+            clockHand = clockHand.next;
+        }
         //        logger.debug("key: {} not in cache, find slot to append", key);
-        // logger.info("key: {} not in cache, find slot to append", key);
-        evict();
+        logger.info("key: {} not in cache, find slot to append", key);
+        if(storage.size() == size) {
+            evict();
+        }
         // update clock hand info
         clockHand.slotKey = key;
         clockHand.slotValue = value;
@@ -73,11 +78,8 @@ public class ClockCacheManager<K, V> extends AbstractCacheManager<K, V> {
 
     @Override
     protected void evict() {
-        // logger.info("--- clock cache evict ---");
-        while (clockHand.useBit == 1) {
-            clockHand.useBit = 0;
-            clockHand = clockHand.next;
-        }
+        logger.info("--- clock cache evict ---");
+
         // now the clockHand points to the page that should be evicted
         // delete from map only if current slot has another record
         if (clockHand.slotKey != null) {
@@ -95,6 +97,7 @@ public class ClockCacheManager<K, V> extends AbstractCacheManager<K, V> {
             // logger.debug("find key {}, remove", key);
             CacheSlot<K, V> slot = storage.get(key);
             slot.useBit = 0;
+            slot.slotKey = null;
             storage.remove(key);
         }
     }
@@ -105,9 +108,11 @@ public class ClockCacheManager<K, V> extends AbstractCacheManager<K, V> {
         storage.clear();
         // 2. set all use bits to 0
         clockHand.useBit = 0;
+        clockHand.slotKey = null;
         CacheSlot<K, V> cur = clockHand.next;
         while (cur != clockHand) {
             cur.useBit = 0;
+            cur.slotKey = null;
             cur = cur.next;
         }
     }
