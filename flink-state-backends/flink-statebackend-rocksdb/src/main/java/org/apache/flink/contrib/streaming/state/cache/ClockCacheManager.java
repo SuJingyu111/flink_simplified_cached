@@ -69,8 +69,9 @@ public class ClockCacheManager<K, V> extends AbstractCacheManager<K, V> {
         }
         //        logger.debug("key: {} not in cache, find slot to append", key);
         logger.info("key: {} not in cache, find slot to append", key);
+        Pair<K, V> evictedKV = null;
         if(storage.size() == size) {
-            evict();
+            evictedKV = evict();
         }
         // update clock hand info
         clockHand.slotKey = key;
@@ -82,7 +83,7 @@ public class ClockCacheManager<K, V> extends AbstractCacheManager<K, V> {
     }
 
     @Override
-    protected void evict() {
+    protected Pair<K, V> evict() {
         logger.info("--- clock cache evict ---");
 
         // now the clockHand points to the page that should be evicted
