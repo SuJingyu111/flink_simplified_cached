@@ -39,15 +39,16 @@ public class LIFOCacheManager<K, V> extends AbstractCacheManager<K, V> {
 
     @Override
     public Pair<K, V> update(K key, V value) {
+        Pair<K, V> evictedKV = null;
         if (this.storage.size() >= this.size && !this.has(key)) {
-            return this.evict();
+            evictedKV = this.evict();
         }
         // logger.info("--- lifo update ---");
         if (!this.has(key)) {
             stack.add(key);
         }
         storage.put(key, value);
-        return null;
+        return evictedKV;
     }
 
     @Override
