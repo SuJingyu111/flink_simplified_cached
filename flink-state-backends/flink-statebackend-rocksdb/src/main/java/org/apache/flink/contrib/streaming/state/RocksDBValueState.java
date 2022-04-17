@@ -18,6 +18,8 @@
 
 package org.apache.flink.contrib.streaming.state;
 
+import org.apache.commons.math3.util.Pair;
+
 import org.apache.flink.api.common.state.State;
 import org.apache.flink.api.common.state.StateDescriptor;
 import org.apache.flink.api.common.state.ValueState;
@@ -109,9 +111,13 @@ class RocksDBValueState<K, N, V> extends AbstractRocksDBState<K, N, V>
 
         try {
             byte[] key = serializeCurrentKeyWithGroupAndNamespace();
-            backend.db.put(columnFamily, writeOptions, key, serializeValue(value));
             String keyString = Arrays.toString(key);
-            this.cache.update(keyString, value);
+            Pair<K, V> evictedKV = this.cache.update(keyString, value);
+
+            if (evictedKV != null) {
+                backend.db.put(columnFamily, writeOptions, ((String) evictedKV.getKey()).getBytes(), serializeValue(evictedKV.getValue()));
+            }
+
         } catch (Exception e) {
             throw new FlinkRuntimeException("Error while adding data to RocksDB", e);
         }

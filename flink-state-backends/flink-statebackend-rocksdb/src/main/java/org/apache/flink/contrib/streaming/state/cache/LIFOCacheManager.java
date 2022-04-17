@@ -1,5 +1,7 @@
 package org.apache.flink.contrib.streaming.state.cache;
 
+import org.apache.commons.math3.util.Pair;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
@@ -36,21 +38,26 @@ public class LIFOCacheManager<K, V> extends AbstractCacheManager<K, V> {
     }
 
     @Override
-    public void update(K key, V value) {
+    public Pair<K, V> update(K key, V value) {
+        Pair<K, V> evictedKV = null;
         if (this.storage.size() >= this.size && !this.has(key)) {
-            this.evict();
+            evictedKV = this.evict();
         }
         // logger.info("--- lifo update ---");
         if (!this.has(key)) {
             stack.add(key);
         }
         storage.put(key, value);
+        return evictedKV;
     }
 
     @Override
-    protected void evict() {
+    protected Pair<K, V> evict() {
         // logger.info("--- lifo evict ---");
-        this.storage.remove(stack.pop());
+        K keyToRemove = stack.pop();
+        Pair<K, V> evictedKV = new Pair<K, V>(keyToRemove, this.storage.get(keyToRemove));
+        this.storage.remove(keyToRemove);
+        return evictedKV;
     }
 
     @Override

@@ -1,5 +1,7 @@
 package org.apache.flink.contrib.streaming.state.cache;
 
+import org.apache.commons.math3.util.Pair;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -33,19 +35,24 @@ public class LRUCacheManager<K, V> extends AbstractCacheManager<K, V> {
     }
 
     @Override
-    public void update(K key, V value) {
+    public Pair<K, V> update(K key, V value) {
+        Pair<K, V> evictedKV = null;
         if (this.storage.size() >= this.size && !this.has(key)) {
-            this.evict();
+            evictedKV = this.evict();
         }
         logger.info("--- lru update ---");
         storage.put(key, value);
+        return evictedKV;
     }
 
     @Override
-    protected void evict() {
+    protected Pair<K, V> evict() {
         logger.info("--- lru evict ---");
         Map.Entry<K, V> firstEntry = storage.entrySet().iterator().next();
+        K keyToRemove = firstEntry.getKey();
+        Pair<K, V> evictedKV = new Pair<K, V>(keyToRemove, this.storage.get(keyToRemove));
         this.storage.remove(firstEntry.getKey());
+        return evictedKV;
     }
 
     @Override
