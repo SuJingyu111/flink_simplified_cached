@@ -32,6 +32,7 @@ import org.rocksdb.ColumnFamilyHandle;
 import org.rocksdb.RocksDBException;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 /**
@@ -123,7 +124,7 @@ class RocksDBValueState<K, N, V> extends AbstractRocksDBState<K, N, V>
             logger.info("update(): keyString: ");
             logger.info(keyString);
             logger.info("update(): double check keyString: ");
-            logger.info(Arrays.toString(keyString.getBytes()));
+            logger.info(Arrays.toString(keyString.getBytes(StandardCharsets.UTF_8)));
 
             Pair<K, V> evictedKV = this.cache.update(keyString, value);
 
