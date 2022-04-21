@@ -118,8 +118,8 @@ class RocksDBValueState<K, N, V> extends AbstractRocksDBState<K, N, V>
             byte[] key = serializeCurrentKeyWithGroupAndNamespace();
             String keyString = Arrays.toString(key);
             logger.info("update(): keyString: ", keyString);
-            logger.info("update(): double check keyString: ", Arrays.toString(keyString.getBytes()));
-
+            logger.info(
+                    "update(): double check keyString: ", Arrays.toString(keyString.getBytes()));
 
             Pair<K, V> evictedKV = this.cache.update(keyString, value);
 
