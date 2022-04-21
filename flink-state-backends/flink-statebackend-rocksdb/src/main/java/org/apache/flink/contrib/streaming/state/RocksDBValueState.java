@@ -137,7 +137,7 @@ class RocksDBValueState<K, N, V> extends AbstractRocksDBState<K, N, V>
                 backend.db.put(
                         columnFamily,
                         writeOptions,
-                        ((String) evictedKV.getKey()).getBytes(),
+                        ((String) evictedKV.getKey()).getBytes(StandardCharsets.UTF_8),
                         serializeValue(evictedKV.getValue()));
             } else {
                 logger.info("update(): evictedKV is null");
