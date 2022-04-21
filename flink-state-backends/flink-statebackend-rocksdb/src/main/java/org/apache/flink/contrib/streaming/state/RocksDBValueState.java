@@ -84,6 +84,8 @@ class RocksDBValueState<K, N, V> extends AbstractRocksDBState<K, N, V>
             logger.info("value state: value()");
             byte[] key = serializeCurrentKeyWithGroupAndNamespace();
             String keyString = Arrays.toString(key);
+            logger.info("value(): keyString: ");
+            logger.info(keyString);
             if (this.cache.has(keyString)) {
                 logger.info("value(): cache hase key");
                 return (V) this.cache.get(keyString);
@@ -98,7 +100,8 @@ class RocksDBValueState<K, N, V> extends AbstractRocksDBState<K, N, V>
 
             dataInputView.setBuffer(valueBytes);
             V value = valueSerializer.deserialize(dataInputView);
-            logger.info("value(): db value: ", value);
+            logger.info("value(): db value: ");
+            logger.info((String) value);
             this.cache.update(keyString, value);
             return value;
         } catch (IOException | RocksDBException e) {
@@ -117,15 +120,19 @@ class RocksDBValueState<K, N, V> extends AbstractRocksDBState<K, N, V>
         try {
             byte[] key = serializeCurrentKeyWithGroupAndNamespace();
             String keyString = Arrays.toString(key);
-            logger.info("update(): keyString: ", keyString);
-            logger.info(
-                    "update(): double check keyString: ", Arrays.toString(keyString.getBytes()));
+            logger.info("update(): keyString: ");
+            logger.info(keyString);
+            logger.info("update(): double check keyString: ");
+            logger.info(Arrays.toString(keyString.getBytes()));
 
             Pair<K, V> evictedKV = this.cache.update(keyString, value);
 
             if (evictedKV != null) {
-                logger.info("update(): evictedKV key: ", evictedKV.getKey());
-                logger.info("update(): evictedKV value: ", evictedKV.getValue());
+                logger.info("update(): evictedKV key: ");
+                logger.info((String) evictedKV.getKey());
+                logger.info("update(): evictedKV value: ");
+                logger.info((String) evictedKV.getValue());
+
                 backend.db.put(
                         columnFamily,
                         writeOptions,
