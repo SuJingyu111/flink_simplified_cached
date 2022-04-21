@@ -38,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 /**
@@ -127,11 +128,11 @@ public abstract class AbstractRocksDBState<K, N, V> implements InternalKvState<K
     }
 
     public String b2String(byte[] byteArray) {
-        return Arrays.toString(Arrays.toString(byteArray).getBytes());
+        return Arrays.toString(Arrays.toString(Arrays.toString(byteArray).getBytes(StandardCharsets.UTF_8)).getBytes(StandardCharsets.UTF_8));
     }
 
     public byte[] s2ByteArray(String s) {
-        return s.getBytes();
+        return s.getBytes(StandardCharsets.UTF_8);
     }
 
     @Override
