@@ -3,9 +3,9 @@ package org.apache.flink.contrib.streaming.state.cache;
 import org.apache.commons.math3.util.Pair;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
-import java.util.LinkedList;
 
 /** Javadoc for First-in First-out CacheManager. */
 public class FIFOCacheManager<K, V> extends AbstractCacheManager<K, V> {
@@ -14,7 +14,8 @@ public class FIFOCacheManager<K, V> extends AbstractCacheManager<K, V> {
     private Queue<K> queue;
 
     /**
-     * Constructor
+     * . Constructor
+     *
      * @param size intial size of queue
      */
     public FIFOCacheManager(int size) {
@@ -24,7 +25,6 @@ public class FIFOCacheManager<K, V> extends AbstractCacheManager<K, V> {
     }
 
     /**
-     *
      * @param key
      * @return
      */
@@ -41,7 +41,8 @@ public class FIFOCacheManager<K, V> extends AbstractCacheManager<K, V> {
     }
 
     /**
-     * Gets the entry, assuming that it exists
+     * . Gets the entry, assuming that it exists
+     *
      * @param key
      * @return
      */
@@ -65,9 +66,7 @@ public class FIFOCacheManager<K, V> extends AbstractCacheManager<K, V> {
         return evictedKV;
     }
 
-    /**
-     * Evicts the cache using FIFO
-     */
+    /** . Evicts the cache using FIFO */
     @Override
     protected Pair<K, V> evict() {
         logger.info("--- fifo evict ---");
@@ -82,9 +81,7 @@ public class FIFOCacheManager<K, V> extends AbstractCacheManager<K, V> {
         this.storage.remove(key);
     }
 
-    /**
-     * Clear the storage
-     */
+    /** . Clear the storage */
     @Override
     protected void clear() {
         storage.clear();

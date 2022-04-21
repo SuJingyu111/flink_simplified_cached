@@ -18,8 +18,6 @@
 
 package org.apache.flink.contrib.streaming.state;
 
-import org.apache.commons.math3.util.Pair;
-
 import org.apache.flink.api.common.state.MapState;
 import org.apache.flink.api.common.state.State;
 import org.apache.flink.api.common.state.StateDescriptor;
@@ -38,6 +36,7 @@ import org.apache.flink.util.FlinkRuntimeException;
 import org.apache.flink.util.Preconditions;
 import org.apache.flink.util.StateMigrationException;
 
+import org.apache.commons.math3.util.Pair;
 import org.rocksdb.ColumnFamilyHandle;
 import org.rocksdb.RocksDB;
 import org.rocksdb.RocksDBException;
@@ -146,8 +145,13 @@ class RocksDBMapState<K, N, UK, UV> extends AbstractRocksDBState<K, N, Map<UK, U
 
         Pair<K, UV> evictedKV = this.cache.update(keyString, userValue);
         if (evictedKV != null) {
-            byte[] rawValueBytes = serializeValueNullSensitive(evictedKV.getValue(), userValueSerializer);
-            backend.db.put(columnFamily, writeOptions, ((String) evictedKV.getKey()).getBytes(), rawValueBytes);
+            byte[] rawValueBytes =
+                    serializeValueNullSensitive(evictedKV.getValue(), userValueSerializer);
+            backend.db.put(
+                    columnFamily,
+                    writeOptions,
+                    ((String) evictedKV.getKey()).getBytes(),
+                    rawValueBytes);
         }
     }
 

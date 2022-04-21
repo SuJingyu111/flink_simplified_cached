@@ -2,8 +2,6 @@ package org.apache.flink.contrib.streaming.state.cache;
 
 import org.apache.commons.math3.util.Pair;
 
-import scala.xml.Null;
-
 import java.util.HashMap;
 
 /**
@@ -70,7 +68,7 @@ public class ClockCacheManager<K, V> extends AbstractCacheManager<K, V> {
         //        logger.debug("key: {} not in cache, find slot to append", key);
         logger.info("key: {} not in cache, find slot to append", key);
         Pair<K, V> evictedKV = null;
-        if(storage.size() == size) {
+        if (storage.size() == size) {
             evictedKV = evict();
         }
         // update clock hand info
@@ -92,8 +90,8 @@ public class ClockCacheManager<K, V> extends AbstractCacheManager<K, V> {
             //            logger.debug("delete key: {} from cache", clockHand.slotKey);
             // logger.info("delete key: {} from cache", clockHand.slotKey);
             // Arrays.toString(clockHand.slotKey));
-            Pair<K, V> evictedKV = new Pair<K, V>(clockHand.slotKey,
-                    (V) storage.get(clockHand.slotKey));
+            Pair<K, V> evictedKV =
+                    new Pair<K, V>(clockHand.slotKey, (V) storage.get(clockHand.slotKey));
             storage.remove(clockHand.slotKey);
             return evictedKV;
         }
