@@ -51,7 +51,7 @@ public class LRUCacheManager<K, V> extends AbstractCacheManager<K, V> {
         Map.Entry<K, V> firstEntry = storage.entrySet().iterator().next();
         K keyToRemove = firstEntry.getKey();
         Pair<K, V> evictedKV = new Pair<K, V>(keyToRemove, this.storage.get(keyToRemove));
-        this.storage.remove(firstEntry.getKey());
+        this.storage.remove(keyToRemove);
         return evictedKV;
     }
 
