@@ -82,27 +82,20 @@ class RocksDBValueState<K, N, V> extends AbstractRocksDBState<K, N, V>
     @Override
     public V value() {
         try {
-            logger.info("value state: value()");
             byte[] key = serializeCurrentKeyWithGroupAndNamespace();
-            String keyString = Arrays.toString(key);
-            logger.info("value(): keyString: ");
-            logger.info(keyString);
+            String keyString = b2String(key);
             if (this.cache.has(keyString)) {
-                logger.info("value(): cache hase key");
                 return (V) this.cache.get(keyString);
             }
             byte[] valueBytes =
                     backend.db.get(columnFamily, serializeCurrentKeyWithGroupAndNamespace());
 
             if (valueBytes == null) {
-                logger.info("value(): valueBytes == null");
                 return getDefaultValue();
             }
 
             dataInputView.setBuffer(valueBytes);
             V value = valueSerializer.deserialize(dataInputView);
-            logger.info("value(): db value: ");
-            logger.info((String) value);
             this.cache.update(keyString, value);
             return value;
         } catch (IOException | RocksDBException e) {
@@ -112,7 +105,6 @@ class RocksDBValueState<K, N, V> extends AbstractRocksDBState<K, N, V>
 
     @Override
     public void update(V value) {
-        logger.info("value state: update()");
         if (value == null) {
             clear();
             return;
@@ -120,27 +112,16 @@ class RocksDBValueState<K, N, V> extends AbstractRocksDBState<K, N, V>
 
         try {
             byte[] key = serializeCurrentKeyWithGroupAndNamespace();
-            String keyString = Arrays.toString(key);
-            logger.info("update(): keyString: ");
-            logger.info(Arrays.toString(Arrays.toString(key).getBytes(StandardCharsets.UTF_8)));
-            logger.info("update(): double check keyString: ");
-            logger.info(Arrays.toString(Arrays.toString(key).getBytes(StandardCharsets.UTF_8)));
+            String keyString = b2String(key);
 
             Pair<K, V> evictedKV = this.cache.update(keyString, value);
 
             if (evictedKV != null) {
-                logger.info("update(): evictedKV key: ");
-                logger.info((String) evictedKV.getKey());
-                logger.info("update(): evictedKV value: ");
-                logger.info((String) evictedKV.getValue());
-
                 backend.db.put(
                         columnFamily,
                         writeOptions,
-                        ((String) evictedKV.getKey()).getBytes(StandardCharsets.UTF_8),
+                        s2ByteArray((String) evictedKV.getKey()),
                         serializeValue(evictedKV.getValue()));
-            } else {
-                logger.info("update(): evictedKV is null");
             }
 
         } catch (Exception e) {

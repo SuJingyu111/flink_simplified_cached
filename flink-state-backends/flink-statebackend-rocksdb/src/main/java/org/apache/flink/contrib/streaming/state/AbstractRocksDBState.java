@@ -38,6 +38,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 /**
  * Base class for {@link State} implementations that store state in a RocksDB database.
@@ -123,6 +125,14 @@ public abstract class AbstractRocksDBState<K, N, V> implements InternalKvState<K
         } catch (RocksDBException e) {
             throw new FlinkRuntimeException("Error while removing entry from RocksDB", e);
         }
+    }
+
+    public String b2String(byte[] byteArray) {
+        return Arrays.toString(Arrays.toString(byteArray).getBytes());
+    }
+
+    public byte[] s2ByteArray(String s) {
+        return s.getBytes();
     }
 
     @Override
