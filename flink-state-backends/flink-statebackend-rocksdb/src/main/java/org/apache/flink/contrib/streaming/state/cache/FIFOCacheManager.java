@@ -1,5 +1,7 @@
 package org.apache.flink.contrib.streaming.state.cache;
 
+import org.apache.commons.math3.util.Pair;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
@@ -50,25 +52,29 @@ public class FIFOCacheManager<K, V> extends AbstractCacheManager<K, V> {
     }
 
     @Override
-    public void update(K key, V value) {
+    public Pair<K, V> update(K key, V value) {
+        Pair<K, V> evictedKV = null;
         if (this.storage.size() >= this.size && !this.has(key)) {
-            this.evict();
+            evictedKV = this.evict();
         }
         logger.info("--- fifo update ---");
         if (!this.has(key)) {
             queue.add(key);
         }
         storage.put(key, value);
-
+        return evictedKV;
     }
 
     /**
      * Evicts the cache using FIFO
      */
     @Override
-    protected void evict() {
+    protected Pair<K, V> evict() {
         logger.info("--- fifo evict ---");
-        this.storage.remove(queue.peek());
+        K keyToRemove = queue.peek();
+        Pair<K, V> evictedKV = new Pair<K, V>(keyToRemove, this.storage.get(keyToRemove));
+        this.storage.remove(keyToRemove);
+        return evictedKV;
     }
 
     @Override
