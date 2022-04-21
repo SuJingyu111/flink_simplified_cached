@@ -70,9 +70,10 @@ public class FIFOCacheManager<K, V> extends AbstractCacheManager<K, V> {
     @Override
     protected Pair<K, V> evict() {
         logger.info("--- fifo evict ---");
-        K keyToRemove = queue.peek();
-        Pair<K, V> evictedKV = new Pair<K, V>(keyToRemove, this.storage.get(keyToRemove));
-        this.storage.remove(keyToRemove);
+        K key = queue.peek();
+        V value = this.storage.get(key);
+        Pair<K, V> evictedKV = new Pair<K, V>(key, value);
+        this.storage.remove(key);
         return evictedKV;
     }
 
