@@ -30,6 +30,8 @@ import org.apache.flink.runtime.state.internal.InternalKvState;
 import org.apache.flink.util.FlinkRuntimeException;
 import org.apache.flink.util.Preconditions;
 import org.apache.flink.util.StateMigrationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.rocksdb.ColumnFamilyHandle;
 import org.rocksdb.RocksDBException;
@@ -63,6 +65,8 @@ public abstract class AbstractRocksDBState<K, N, V> implements InternalKvState<K
 
     /** The column family of this particular instance of state. */
     protected ColumnFamilyHandle columnFamily;
+
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     protected RocksDBStateCache cache;
 

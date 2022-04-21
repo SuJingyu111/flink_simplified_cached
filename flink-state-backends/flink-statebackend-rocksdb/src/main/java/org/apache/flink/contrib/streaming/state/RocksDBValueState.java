@@ -81,19 +81,24 @@ class RocksDBValueState<K, N, V> extends AbstractRocksDBState<K, N, V>
     @Override
     public V value() {
         try {
+            logger.info("value state: value()");
             byte[] key = serializeCurrentKeyWithGroupAndNamespace();
             String keyString = Arrays.toString(key);
             if (this.cache.has(keyString)) {
+                logger.info("value(): cache hase key");
                 return (V) this.cache.get(keyString);
             }
             byte[] valueBytes =
                     backend.db.get(columnFamily, serializeCurrentKeyWithGroupAndNamespace());
 
             if (valueBytes == null) {
+                logger.info("value(): valueBytes == null");
                 return getDefaultValue();
             }
+
             dataInputView.setBuffer(valueBytes);
             V value = valueSerializer.deserialize(dataInputView);
+            logger.info("value(): db value: ", value);
             this.cache.update(keyString, value);
             return value;
         } catch (IOException | RocksDBException e) {
@@ -103,6 +108,7 @@ class RocksDBValueState<K, N, V> extends AbstractRocksDBState<K, N, V>
 
     @Override
     public void update(V value) {
+        logger.info("value state: update()");
         if (value == null) {
             clear();
             return;
@@ -111,14 +117,22 @@ class RocksDBValueState<K, N, V> extends AbstractRocksDBState<K, N, V>
         try {
             byte[] key = serializeCurrentKeyWithGroupAndNamespace();
             String keyString = Arrays.toString(key);
+            logger.info("update(): keyString: ", keyString);
+            logger.info("update(): double check keyString: ", Arrays.toString(keyString.getBytes()));
+
+
             Pair<K, V> evictedKV = this.cache.update(keyString, value);
 
             if (evictedKV != null) {
+                logger.info("update(): evictedKV key: ", evictedKV.getKey());
+                logger.info("update(): evictedKV value: ", evictedKV.getValue());
                 backend.db.put(
                         columnFamily,
                         writeOptions,
                         ((String) evictedKV.getKey()).getBytes(),
                         serializeValue(evictedKV.getValue()));
+            } else {
+                logger.info("update(): evictedKV is null");
             }
 
         } catch (Exception e) {
