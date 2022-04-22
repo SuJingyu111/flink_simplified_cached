@@ -117,11 +117,10 @@ public class LFUCacheManager<V> extends AbstractCacheManager<V> {
     }
 
     @Override
-    protected void remove(K key) {
-        if (!keyEntryMap.containsKey(key)) {
-            return;
-        } else {
-            Entry removedEntry = keyEntryMap.remove(key);
+    protected void remove(byte[] key) {
+        String keyString = Arrays.toString(key);
+        if (keyEntryMap.containsKey(keyString)) {
+            Entry removedEntry = keyEntryMap.remove(keyString);
             long removedFreq = removedEntry.freq;
             LinkedList<Entry> entryList = freqEntryListMap.get(removedFreq);
             entryList.remove(removedEntry);
