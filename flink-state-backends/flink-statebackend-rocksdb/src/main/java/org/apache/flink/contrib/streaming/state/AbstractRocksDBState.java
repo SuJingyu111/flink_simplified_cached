@@ -128,7 +128,9 @@ public abstract class AbstractRocksDBState<K, N, V> implements InternalKvState<K
     }
 
     public String b2String(byte[] byteArray) {
-        return Arrays.toString(Arrays.toString(Arrays.toString(byteArray).getBytes(StandardCharsets.UTF_8)).getBytes(StandardCharsets.UTF_8));
+        return Arrays.toString(
+                Arrays.toString(Arrays.toString(byteArray).getBytes(StandardCharsets.UTF_8))
+                        .getBytes(StandardCharsets.UTF_8));
     }
 
     public byte[] s2ByteArray(String s) {

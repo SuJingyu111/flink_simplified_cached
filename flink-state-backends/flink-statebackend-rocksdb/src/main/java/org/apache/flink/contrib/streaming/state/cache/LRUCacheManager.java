@@ -2,7 +2,6 @@ package org.apache.flink.contrib.streaming.state.cache;
 
 import org.apache.commons.math3.util.Pair;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
