@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 /** Javadoc for LFUCacheManager. */
-public class LFUCacheManager<K, V> extends AbstractCacheManager<K, V> {
+public class LFUCacheManager<V> extends AbstractCacheManager<V> {
 
     /** Javadoc for a data entry. */
     protected class Entry {
