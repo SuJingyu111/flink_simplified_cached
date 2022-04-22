@@ -74,29 +74,30 @@ public class LFUCacheManager<V> extends AbstractCacheManager<V> {
     }
 
     @Override
-    public Pair<K, V> update(K key, V value) {
+    public Pair<byte[], V> update(byte[] key, V value) {
+        String keyString = Arrays.toString(key);
         if (size == 0) {
             return null;
         }
-        Pair<K, V> evictedKV = null;
-        if (!keyEntryMap.containsKey(key)) {
+        Pair<byte[], V> evictedKV = null;
+        if (!keyEntryMap.containsKey(keyString)) {
             if (keyEntryMap.size() == size) {
                 evictedKV = evict();
             }
             LinkedList<Entry> list = freqEntryListMap.getOrDefault(1L, new LinkedList<Entry>());
-            Entry newEntry = new Entry(key, value, 1);
+            Entry newEntry = new Entry(keyString, value, 1, key);
             list.offerFirst(newEntry);
             freqEntryListMap.put(1L, list);
-            keyEntryMap.put(key, newEntry);
+            keyEntryMap.put(keyString, newEntry);
             minFrequency = 1;
         } else {
-            Entry entry = keyEntryMap.get(key);
+            Entry entry = keyEntryMap.get(keyString);
             long freq = entry.freq;
             LinkedList<Entry> list = getUpdatedFreqEntryList(entry);
             entry.freq += 1;
             list.offerFirst(entry);
             freqEntryListMap.put(freq + 1, list);
-            keyEntryMap.put(key, entry);
+            keyEntryMap.put(keyString, entry);
         }
         return evictedKV;
     }
