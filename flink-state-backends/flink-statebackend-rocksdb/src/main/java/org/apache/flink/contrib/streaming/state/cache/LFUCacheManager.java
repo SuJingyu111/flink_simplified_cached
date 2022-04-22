@@ -2,6 +2,7 @@ package org.apache.flink.contrib.streaming.state.cache;
 
 import org.apache.commons.math3.util.Pair;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -10,20 +11,23 @@ public class LFUCacheManager<K, V> extends AbstractCacheManager<K, V> {
 
     /** Javadoc for a data entry. */
     protected class Entry {
-        K key;
+        String key;
         V val;
         long freq;
 
-        Entry(K key, V val, long freq) {
+        byte[] byteKey;
+
+        Entry(String key, V val, long freq, byte[] byteKey) {
             this.key = key;
             this.val = val;
             this.freq = freq;
+            this.byteKey = byteKey;
         }
     }
 
     // todo: clear freq counter after a time interval
     private long minFrequency;
-    private HashMap<K, Entry> keyEntryMap;
+    private HashMap<String, Entry> keyEntryMap;
     private HashMap<Long, LinkedList<Entry>> freqEntryListMap;
 
     public LFUCacheManager(int size) {
@@ -34,10 +38,11 @@ public class LFUCacheManager<K, V> extends AbstractCacheManager<K, V> {
     }
 
     @Override
-    public boolean has(K key) {
+    public boolean has(byte[] key) {
         printRatio();
         this.totalCount++;
-        if (keyEntryMap.containsKey(key)) {
+        String keyString = Arrays.toString(key);
+        if (keyEntryMap.containsKey(keyString)) {
             this.hitCount++;
             return true;
         }
@@ -45,7 +50,7 @@ public class LFUCacheManager<K, V> extends AbstractCacheManager<K, V> {
     }
 
     @Override
-    public V get(K key) {
+    public V get(byte[] key) {
         if (size == 0 || !keyEntryMap.containsKey(key)) {
             return null;
         }
