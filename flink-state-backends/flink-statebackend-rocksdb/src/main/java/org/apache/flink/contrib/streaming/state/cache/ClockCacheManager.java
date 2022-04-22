@@ -41,11 +41,11 @@ public class ClockCacheManager<V> extends AbstractCacheManager<V> {
     // assume has already check key exists with hash
     @Override
     public V get(byte[] key) {
-        // logger.info("--- clock cache get ---");
+        logger.info("--- clock cache get ---");
         String innerKey = Arrays.toString(key);
         CacheSlot<String, Pair<byte[], V>> slot = storage.getOrDefault(innerKey, null);
         if (slot == null) {
-            // logger.info("key: {} not in cache", key);
+            logger.info("key: {} not in cache", innerKey);
             return null;
         }
         slot.useBit = 1; // set use bit to 1 when access the slot
@@ -54,12 +54,12 @@ public class ClockCacheManager<V> extends AbstractCacheManager<V> {
 
     @Override
     public Pair<byte[], V> update(byte[] key, V value) {
-        // logger.info("--- clock cache update ---");
+        logger.info("--- clock cache update ---");
         // if already contains the key, just update
         String innerKey = Arrays.toString(key);
         if (has(key)) {
-            //            logger.debug("key: {} already in cache, update", key);
-            // logger.info("key: {} already in cache, update", key);
+            //                        logger.debug("key: {} already in cache, update", key);
+            logger.info("key: {} already in cache, update", innerKey);
             CacheSlot<String, Pair<byte[], V>> slot = storage.get(innerKey);
             slot.slotValue = new Pair<>(key, value);
             slot.useBit = 1;
@@ -73,7 +73,12 @@ public class ClockCacheManager<V> extends AbstractCacheManager<V> {
         //        logger.debug("key: {} not in cache, find slot to append", key);
         logger.info("key: {} not in cache, find slot to append", key);
         Pair<byte[], V> evictedKV = null;
+        logger.info("cache size: {}, current storage keys number: {}", size, storage.size());
         if (storage.size() == size) {
+            logger.info(
+                    "cache size: {} == current storage keys number: {}. should evict",
+                    size,
+                    storage.size());
             evictedKV = evict();
         }
         // update clock hand info
