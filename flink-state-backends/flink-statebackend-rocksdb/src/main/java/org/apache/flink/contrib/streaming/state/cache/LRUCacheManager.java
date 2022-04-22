@@ -21,7 +21,8 @@ public class LRUCacheManager<V> extends AbstractCacheManager<V> {
     public boolean has(byte[] key) {
         // printRatio();
         boolean hit = false;
-        if (this.storage.containsKey(key)) {
+        String keyString = Arrays.toString(key);
+        if (this.storage.containsKey(keyString)) {
             this.hitCount++;
             hit = true;
         }
