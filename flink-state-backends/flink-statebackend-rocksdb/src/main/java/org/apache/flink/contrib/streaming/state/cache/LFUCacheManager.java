@@ -113,7 +113,7 @@ public class LFUCacheManager<V> extends AbstractCacheManager<V> {
         if (freqEntryListMap.get(minFrequency).size() == 0) {
             freqEntryListMap.remove(minFrequency);
         }
-        return new Pair<byte[], V>(removeEntry.byteKey, removeEntry.val);
+        return new Pair<>(removeEntry.byteKey, removeEntry.val);
     }
 
     @Override
