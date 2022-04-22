@@ -145,11 +145,7 @@ class RocksDBMapState<K, N, UK, UV> extends AbstractRocksDBState<K, N, Map<UK, U
         if (evictedKV != null) {
             byte[] rawValueBytes =
                     serializeValueNullSensitive(evictedKV.getValue(), userValueSerializer);
-            backend.db.put(
-                    columnFamily,
-                    writeOptions,
-                    evictedKV.getKey(),
-                    rawValueBytes);
+            backend.db.put(columnFamily, writeOptions, evictedKV.getKey(), rawValueBytes);
         }
     }
 
