@@ -81,9 +81,8 @@ class RocksDBValueState<K, N, V> extends AbstractRocksDBState<K, N, V>
     public V value() {
         try {
             byte[] key = serializeCurrentKeyWithGroupAndNamespace();
-            String keyString = b2String(key);
-            if (this.cache.has(keyString)) {
-                return (V) this.cache.get(keyString);
+            if (this.cache.has(key)) {
+                return (V) this.cache.get(key);
             }
             byte[] valueBytes =
                     backend.db.get(columnFamily, serializeCurrentKeyWithGroupAndNamespace());
@@ -94,7 +93,7 @@ class RocksDBValueState<K, N, V> extends AbstractRocksDBState<K, N, V>
 
             dataInputView.setBuffer(valueBytes);
             V value = valueSerializer.deserialize(dataInputView);
-            this.cache.update(keyString, value);
+            this.cache.update(key, value);
             return value;
         } catch (IOException | RocksDBException e) {
             throw new FlinkRuntimeException("Error while retrieving data from RocksDB.", e);
@@ -110,19 +109,14 @@ class RocksDBValueState<K, N, V> extends AbstractRocksDBState<K, N, V>
 
         try {
             byte[] key = serializeCurrentKeyWithGroupAndNamespace();
-            String keyString = b2String(key);
-            logger.info("value(): 1: ");
-            logger.info(keyString);
-            logger.info("value(): 2: ");
-            logger.info(b2String(s2ByteArray(keyString)));
 
-            Pair<K, V> evictedKV = this.cache.update(keyString, value);
+            Pair<byte[], V> evictedKV = this.cache.update(key, value);
 
             if (evictedKV != null) {
                 backend.db.put(
                         columnFamily,
                         writeOptions,
-                        s2ByteArray((String) evictedKV.getKey()),
+                        evictedKV.getKey(),
                         serializeValue(evictedKV.getValue()));
             }
 
