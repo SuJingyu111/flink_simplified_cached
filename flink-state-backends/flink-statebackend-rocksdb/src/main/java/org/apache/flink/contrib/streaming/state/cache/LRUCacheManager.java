@@ -8,9 +8,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /** Javadoc for LRUCacheManager. */
-public class LRUCacheManager extends AbstractCacheManager {
+public class LRUCacheManager<V> extends AbstractCacheManager<V> {
 
-    private LinkedHashMap<String, Pair<byte[], byte[]>> storage;
+    private LinkedHashMap<String, Pair<byte[], V>> storage;
 
     public LRUCacheManager(int size) {
         super(size);
@@ -31,11 +31,11 @@ public class LRUCacheManager extends AbstractCacheManager {
 
     // assume has already check key exists with hash
     @Override
-    public byte[] get(byte[] key) {
+    public V get(byte[] key) {
         logger.info("--- lru get ---");
         String keyString = Arrays.toString(key);
 
-        Pair<byte[], byte[]> result = storage.getOrDefault(keyString, null);
+        Pair<byte[], V> result = storage.getOrDefault(keyString, null);
         if (result == null) {
             return null;
         }
@@ -43,7 +43,7 @@ public class LRUCacheManager extends AbstractCacheManager {
     }
 
     @Override
-    public Pair update(byte[] key, byte[] value) {
+    public Pair update(byte[] key, V value) {
         String keyString = Arrays.toString(key);
 
         Pair evictedKV = null;
@@ -56,7 +56,7 @@ public class LRUCacheManager extends AbstractCacheManager {
     }
 
     @Override
-    protected Pair evict() {
+    protected Pair<byte[], V> evict() {
         logger.info("--- lru evict ---");
         Map.Entry firstEntry = storage.entrySet().iterator().next();
         String keyString = (String) firstEntry.getKey();

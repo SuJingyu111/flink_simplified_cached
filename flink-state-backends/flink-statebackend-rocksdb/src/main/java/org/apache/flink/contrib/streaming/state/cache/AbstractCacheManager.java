@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /** Javadoc for RocksDBStateCache. Interface for cache manager. */
-public abstract class AbstractCacheManager {
+public abstract class AbstractCacheManager<V> {
 
     protected int size; // size of cache, can be in terms of bytes or # of kv pairs
 
@@ -23,14 +23,14 @@ public abstract class AbstractCacheManager {
     public abstract boolean has(byte[] key);
 
     // gets value related to key from cache storage, need to interact with backend instance
-    public abstract byte[] get(byte[] key);
+    public abstract V get(byte[] key);
 
     // puts kv pair into cache, does not need to talk to backend
-    public abstract Pair<byte[], byte[]> update(byte[] key, byte[] value);
+    public abstract Pair<byte[], V> update(byte[] key, V value);
 
     // private function to evict kv pair when exceed preset size. Need to be overridden. Implement
     // eviction policy here.
-    protected abstract Pair<byte[], byte[]> evict();
+    protected abstract Pair<byte[], V> evict();
 
     protected abstract void remove(byte[] key);
 
