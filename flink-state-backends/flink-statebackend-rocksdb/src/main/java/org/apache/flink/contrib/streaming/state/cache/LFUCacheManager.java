@@ -103,17 +103,17 @@ public class LFUCacheManager<V> extends AbstractCacheManager<V> {
     }
 
     @Override
-    protected Pair<K, V> evict() {
+    protected Pair<byte[], V> evict() {
         Entry entry = freqEntryListMap.get(minFrequency).peekLast();
         assert entry != null;
-        K keyToRemove = entry.key;
+        String keyToRemove = entry.key;
         Entry removeEntry = keyEntryMap.get(keyToRemove);
         keyEntryMap.remove(keyToRemove);
         freqEntryListMap.get(minFrequency).pollLast();
         if (freqEntryListMap.get(minFrequency).size() == 0) {
             freqEntryListMap.remove(minFrequency);
         }
-        return new Pair<K, V>(removeEntry.key, removeEntry.val);
+        return new Pair<byte[], V>(removeEntry.byteKey, removeEntry.val);
     }
 
     @Override
