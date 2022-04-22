@@ -13,7 +13,7 @@ public class LRUCacheManager<V> extends AbstractCacheManager<V> {
 
     public LRUCacheManager(int size) {
         super(size);
-        storage = new LinkedHashMap(size, 0.75f, true);
+        storage = new LinkedHashMap<>(size, 0.75f, true);
     }
 
     @Override
@@ -43,24 +43,24 @@ public class LRUCacheManager<V> extends AbstractCacheManager<V> {
     }
 
     @Override
-    public Pair update(byte[] key, V value) {
+    public Pair<byte[], V> update(byte[] key, V value) {
         String keyString = Arrays.toString(key);
 
-        Pair evictedKV = null;
+        Pair<byte[], V> evictedKV = null;
         if (this.storage.size() >= this.size && !this.has(key)) {
             evictedKV = this.evict();
         }
         logger.info("--- lru update ---");
-        storage.put(keyString, new Pair(key, value));
+        storage.put(keyString, new Pair<>(key, value));
         return evictedKV;
     }
 
     @Override
     protected Pair<byte[], V> evict() {
         logger.info("--- lru evict ---");
-        Map.Entry firstEntry = storage.entrySet().iterator().next();
-        String keyString = (String) firstEntry.getKey();
-        Pair evictedKV = (Pair) firstEntry.getValue();
+        Map.Entry<String, Pair<byte[], V>> firstEntry = storage.entrySet().iterator().next();
+        String keyString = firstEntry.getKey();
+        Pair<byte[], V> evictedKV = firstEntry.getValue();
         this.storage.remove(keyString);
         return evictedKV;
     }
