@@ -139,14 +139,16 @@ class RocksDBListState<K, N, V> extends AbstractRocksDBState<K, N, List<V>>
 
         try {
             byte[] key = serializeCurrentKeyWithGroupAndNamespace();
+            if (this.cache.has(key)) {
+                List<V> cacheValue = (List<V>) this.cache.get(key);
+                if (cacheValue == null) {
+                    cacheValue = new ArrayList<>();
+                }
+                cacheValue.add(value);
+                this.cache.update(key, cacheValue);
+            }
             backend.db.merge(
                     columnFamily, writeOptions, key, serializeValue(value, elementSerializer));
-            List<V> cacheValue = (List<V>) this.cache.get(key);
-            if (cacheValue == null) {
-                cacheValue = new ArrayList<>();
-            }
-            cacheValue.add(value);
-            this.cache.update(key, cacheValue);
         } catch (Exception e) {
             throw new FlinkRuntimeException("Error while adding data to RocksDB", e);
         }
@@ -218,16 +220,18 @@ class RocksDBListState<K, N, V> extends AbstractRocksDBState<K, N, List<V>>
         if (!values.isEmpty()) {
             try {
                 byte[] key = serializeCurrentKeyWithGroupAndNamespace();
+                if (this.cache.has(key)) {
+                    List<V> cacheValue = (List<V>) this.cache.get(key);
+                    for (V v : values) {
+                        cacheValue.add(v);
+                    }
+                    this.cache.update(key, cacheValue);
+                }
                 backend.db.merge(
                         columnFamily,
                         writeOptions,
                         key,
                         listSerializer.serializeList(values, elementSerializer));
-                List<V> cacheValue = (List<V>) this.cache.get(key);
-                for (V v : values) {
-                    cacheValue.add(v);
-                }
-                this.cache.update(key, cacheValue);
             } catch (IOException | RocksDBException e) {
                 throw new FlinkRuntimeException("Error while updating data to RocksDB", e);
             }
