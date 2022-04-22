@@ -155,6 +155,6 @@ public class LFUCacheManager<V> extends AbstractCacheManager<V> {
                 minFrequency += 1;
             }
         }
-        return freqEntryListMap.getOrDefault(freq + 1, new LinkedList<Entry>());
+        return freqEntryListMap.getOrDefault(freq + 1, new LinkedList<>());
     }
 }
