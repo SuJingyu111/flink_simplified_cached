@@ -51,10 +51,11 @@ public class LFUCacheManager<V> extends AbstractCacheManager<V> {
 
     @Override
     public V get(byte[] key) {
-        if (size == 0 || !keyEntryMap.containsKey(key)) {
+        String keyString = Arrays.toString(key);
+        if (size == 0 || !keyEntryMap.containsKey(keyString)) {
             return null;
         }
-        Entry entry = keyEntryMap.get(key);
+        Entry entry = keyEntryMap.get(keyString);
         V val = entry.val;
         long freq = entry.freq;
         freqEntryListMap.get(freq).remove(entry);
@@ -65,10 +66,10 @@ public class LFUCacheManager<V> extends AbstractCacheManager<V> {
             }
         }
         entry.freq += 1;
-        LinkedList<Entry> list = freqEntryListMap.getOrDefault(freq + 1, new LinkedList<Entry>());
+        LinkedList<Entry> list = freqEntryListMap.getOrDefault(freq + 1, new LinkedList<>());
         list.offerFirst(entry);
         freqEntryListMap.put(freq + 1, list);
-        keyEntryMap.put(key, freqEntryListMap.get(freq + 1).peekFirst());
+        keyEntryMap.put(keyString, freqEntryListMap.get(freq + 1).peekFirst());
         return val;
     }
 
