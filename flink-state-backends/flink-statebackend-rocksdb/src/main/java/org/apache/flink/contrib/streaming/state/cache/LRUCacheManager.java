@@ -3,6 +3,7 @@ package org.apache.flink.contrib.streaming.state.cache;
 import org.apache.commons.math3.util.Pair;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -11,16 +12,26 @@ public class LRUCacheManager<V> extends AbstractCacheManager<V> {
 
     private LinkedHashMap<String, Pair<byte[], V>> storage;
 
+    private HashSet<String> visited;
+
     public LRUCacheManager(int size) {
         super(size);
         storage = new LinkedHashMap<>(size, 0.75f, true);
+        visited = new HashSet<>();
     }
 
     @Override
     public boolean has(byte[] key) {
         // printRatio();
+        logger.info("--- lru has ---");
         boolean hit = false;
         String keyString = Arrays.toString(key);
+        if (visited.contains(keyString)) {
+            logger.info("contains key");
+        } else {
+            logger.info("visited does not contain key");
+            visited.add(keyString);
+        }
         if (this.storage.containsKey(keyString)) {
             this.hitCount++;
             hit = true;

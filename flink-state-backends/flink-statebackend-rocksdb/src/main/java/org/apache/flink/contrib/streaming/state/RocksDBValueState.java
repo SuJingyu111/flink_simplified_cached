@@ -88,7 +88,7 @@ class RocksDBValueState<K, N, V> extends AbstractRocksDBState<K, N, V>
                 return (V) this.cache.get(key);
             }
             byte[] valueBytes =
-                    backend.db.get(columnFamily, serializeCurrentKeyWithGroupAndNamespace());
+                    backend.db.get(columnFamily, key);
 
             if (valueBytes == null) {
                 return getDefaultValue();
