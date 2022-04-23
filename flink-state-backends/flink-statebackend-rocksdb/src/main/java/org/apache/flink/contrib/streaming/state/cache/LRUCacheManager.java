@@ -55,13 +55,13 @@ public class LRUCacheManager<V> extends AbstractCacheManager<V> {
 
     @Override
     public Pair<byte[], V> update(byte[] key, V value) {
+        logger.info("--- lru update ---");
         String keyString = Arrays.toString(key);
 
         Pair<byte[], V> evictedKV = null;
         if (this.storage.size() >= this.size && !this.has(key)) {
             evictedKV = this.evict();
         }
-        logger.info("--- lru update ---");
         storage.put(keyString, new Pair<>(key, value));
         return evictedKV;
     }
