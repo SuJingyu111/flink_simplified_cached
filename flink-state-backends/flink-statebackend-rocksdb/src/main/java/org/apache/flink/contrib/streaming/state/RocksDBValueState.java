@@ -97,7 +97,19 @@ class RocksDBValueState<K, N, V> extends AbstractRocksDBState<K, N, V>
 
             dataInputView.setBuffer(valueBytes);
             V value = valueSerializer.deserialize(dataInputView);
-            this.cache.update(key, value);
+
+            Pair<byte[], V> evictedKV = this.cache.update(key, value);
+
+            if (evictedKV != null) {
+                logger.info("update() evicted key:");
+                logger.info(Arrays.toString(evictedKV.getKey()));
+                backend.db.put(
+                        columnFamily,
+                        writeOptions,
+                        evictedKV.getKey(),
+                        serializeValue(evictedKV.getValue()));
+            }
+
             return value;
         } catch (IOException | RocksDBException e) {
             throw new FlinkRuntimeException("Error while retrieving data from RocksDB.", e);
