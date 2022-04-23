@@ -91,6 +91,7 @@ class RocksDBValueState<K, N, V> extends AbstractRocksDBState<K, N, V>
                     backend.db.get(columnFamily, key);
 
             if (valueBytes == null) {
+                logger.info("value() not in db");
                 return getDefaultValue();
             }
 
