@@ -117,10 +117,10 @@ class RocksDBValueState<K, N, V> extends AbstractRocksDBState<K, N, V>
             logger.info(Arrays.toString(key));
 
             Pair<byte[], V> evictedKV = this.cache.update(key, value);
-            logger.info("update() evicted key:");
-            logger.info(Arrays.toString(evictedKV.getKey()));
 
             if (evictedKV != null) {
+                logger.info("update() evicted key:");
+                logger.info(Arrays.toString(evictedKV.getKey()));
                 backend.db.put(
                         columnFamily,
                         writeOptions,
