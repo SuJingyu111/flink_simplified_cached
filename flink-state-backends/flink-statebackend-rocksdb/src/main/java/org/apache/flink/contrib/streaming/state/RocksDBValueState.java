@@ -32,6 +32,7 @@ import org.rocksdb.ColumnFamilyHandle;
 import org.rocksdb.RocksDBException;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * {@link ValueState} implementation that stores state in RocksDB.
@@ -81,6 +82,8 @@ class RocksDBValueState<K, N, V> extends AbstractRocksDBState<K, N, V>
     public V value() {
         try {
             byte[] key = serializeCurrentKeyWithGroupAndNamespace();
+            logger.info("value() key:");
+            logger.info(Arrays.toString(key));
             if (this.cache.has(key)) {
                 return (V) this.cache.get(key);
             }
@@ -109,6 +112,8 @@ class RocksDBValueState<K, N, V> extends AbstractRocksDBState<K, N, V>
 
         try {
             byte[] key = serializeCurrentKeyWithGroupAndNamespace();
+            logger.info("update() key:");
+            logger.info(Arrays.toString(key));
 
             Pair<byte[], V> evictedKV = this.cache.update(key, value);
 
