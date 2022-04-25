@@ -23,15 +23,15 @@ public class LRUCacheManager<V> extends AbstractCacheManager<V> {
     @Override
     public boolean has(byte[] key) {
         // printRatio();
-        //logger.info("--- lru has ---");
+        // logger.info("--- lru has ---");
         boolean hit = false;
         String keyString = Arrays.toString(key);
-        if (visited.contains(keyString)) {
-            //logger.info("contains key");
-        } else {
-            //logger.info("visited does not contain key");
-            visited.add(keyString);
-        }
+        // if (visited.contains(keyString)) {
+        // logger.info("contains key");
+        // } else {
+        // logger.info("visited does not contain key");
+        visited.add(keyString);
+        // }
         if (this.storage.containsKey(keyString)) {
             this.hitCount++;
             hit = true;
@@ -43,7 +43,7 @@ public class LRUCacheManager<V> extends AbstractCacheManager<V> {
     // assume has already check key exists with hash
     @Override
     public V get(byte[] key) {
-        //logger.info("--- lru get ---");
+        // logger.info("--- lru get ---");
         String keyString = Arrays.toString(key);
 
         Pair<byte[], V> result = storage.getOrDefault(keyString, null);
@@ -55,7 +55,7 @@ public class LRUCacheManager<V> extends AbstractCacheManager<V> {
 
     @Override
     public Pair<byte[], V> update(byte[] key, V value) {
-        //logger.info("--- lru update ---");
+        // logger.info("--- lru update ---");
         String keyString = Arrays.toString(key);
 
         Pair<byte[], V> evictedKV = null;
@@ -68,7 +68,7 @@ public class LRUCacheManager<V> extends AbstractCacheManager<V> {
 
     @Override
     protected Pair<byte[], V> evict() {
-        //logger.info("--- lru evict ---");
+        // logger.info("--- lru evict ---");
         Map.Entry<String, Pair<byte[], V>> firstEntry = storage.entrySet().iterator().next();
         String keyString = firstEntry.getKey();
         Pair<byte[], V> evictedKV = firstEntry.getValue();
@@ -78,7 +78,7 @@ public class LRUCacheManager<V> extends AbstractCacheManager<V> {
 
     @Override
     protected void remove(byte[] key) {
-        //logger.info("--- lru remove ---");
+        // logger.info("--- lru remove ---");
         String keyString = Arrays.toString(key);
         this.storage.remove(keyString);
     }

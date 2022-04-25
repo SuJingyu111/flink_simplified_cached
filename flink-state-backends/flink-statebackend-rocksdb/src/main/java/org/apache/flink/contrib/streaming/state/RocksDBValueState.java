@@ -32,7 +32,6 @@ import org.rocksdb.ColumnFamilyHandle;
 import org.rocksdb.RocksDBException;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 /**
  * {@link ValueState} implementation that stores state in RocksDB.
@@ -82,15 +81,15 @@ class RocksDBValueState<K, N, V> extends AbstractRocksDBState<K, N, V>
     public V value() {
         try {
             byte[] key = serializeCurrentKeyWithGroupAndNamespace();
-            logger.info("value() key:");
-            logger.info(Arrays.toString(key));
+            // logger.info("value() key:");
+            // logger.info(Arrays.toString(key));
             if (this.cache.has(key)) {
                 return (V) this.cache.get(key);
             }
             byte[] valueBytes = backend.db.get(columnFamily, key);
 
             if (valueBytes == null) {
-                logger.info("value() not in db");
+                // logger.info("value() not in db");
                 return getDefaultValue();
             }
 
@@ -100,8 +99,8 @@ class RocksDBValueState<K, N, V> extends AbstractRocksDBState<K, N, V>
             Pair<byte[], V> evictedKV = this.cache.update(key, value);
 
             if (evictedKV != null) {
-                logger.info("update() evicted key:");
-                logger.info(Arrays.toString(evictedKV.getKey()));
+                // logger.info("update() evicted key:");
+                // logger.info(Arrays.toString(evictedKV.getKey()));
                 backend.db.put(
                         columnFamily,
                         writeOptions,
@@ -124,14 +123,14 @@ class RocksDBValueState<K, N, V> extends AbstractRocksDBState<K, N, V>
 
         try {
             byte[] key = serializeCurrentKeyWithGroupAndNamespace();
-            logger.info("update() key:");
-            logger.info(Arrays.toString(key));
+            // logger.info("update() key:");
+            // logger.info(Arrays.toString(key));
 
             Pair<byte[], V> evictedKV = this.cache.update(key, value);
 
             if (evictedKV != null) {
-                logger.info("update() evicted key:");
-                logger.info(Arrays.toString(evictedKV.getKey()));
+                // logger.info("update() evicted key:");
+                // logger.info(Arrays.toString(evictedKV.getKey()));
                 backend.db.put(
                         columnFamily,
                         writeOptions,
