@@ -131,7 +131,12 @@ class RocksDBMapState<K, N, UK, UV> extends AbstractRocksDBState<K, N, Map<UK, U
                 (rawValueBytes == null
                         ? null
                         : deserializeUserValue(dataInputView, rawValueBytes, userValueSerializer));
-        this.cache.update(rawKeyBytes, value);
+        Pair<byte[], UV> evictedKV = this.cache.update(rawKeyBytes, value);
+        if (evictedKV != null) {
+            byte[] saveValue =
+                    serializeValueNullSensitive(evictedKV.getValue(), userValueSerializer);
+            backend.db.put(columnFamily, writeOptions, evictedKV.getKey(), saveValue);
+        }
         return value;
     }
 
@@ -166,6 +171,12 @@ class RocksDBMapState<K, N, UK, UV> extends AbstractRocksDBState<K, N, Map<UK, U
                         serializeValueNullSensitive(entry.getValue(), userValueSerializer);
                 writeBatchWrapper.put(columnFamily, rawKeyBytes, rawValueBytes);
                 this.cache.update(rawKeyBytes, entry.getValue());
+                Pair<byte[], UV> evictedKV = this.cache.update(rawKeyBytes, entry.getValue());
+                if (evictedKV != null) {
+                    byte[] saveValue =
+                            serializeValueNullSensitive(evictedKV.getValue(), userValueSerializer);
+                    backend.db.put(columnFamily, writeOptions, evictedKV.getKey(), saveValue);
+                }
             }
         }
     }
