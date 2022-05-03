@@ -21,7 +21,6 @@ public class LIFOCacheManager<V> extends AbstractCacheManager<V> {
 
     @Override
     public boolean has(byte[] key) {
-        // printRatio();
         String keyString = Arrays.toString(key);
         boolean hit = false;
         if (this.storage.containsKey(keyString)) {
@@ -35,7 +34,6 @@ public class LIFOCacheManager<V> extends AbstractCacheManager<V> {
     // assume has already check key exists with hash
     @Override
     public V get(byte[] key) {
-        // logger.info("--- lifo get ---");
         String keyString = Arrays.toString(key);
         return storage.get(keyString).getSecond();
     }
@@ -57,7 +55,6 @@ public class LIFOCacheManager<V> extends AbstractCacheManager<V> {
 
     @Override
     protected Pair<byte[], V> evict() {
-        // logger.info("--- lifo evict ---");
         String keyToRemove = stack.pop();
         Pair<byte[], V> evictedKV = this.storage.get(keyToRemove);
         this.storage.remove(keyToRemove);
@@ -66,7 +63,6 @@ public class LIFOCacheManager<V> extends AbstractCacheManager<V> {
 
     @Override
     protected void remove(byte[] key) {
-        // logger.info("--- lru remove ---");
         String keyString = Arrays.toString(key);
         this.storage.remove(keyString);
     }
