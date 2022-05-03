@@ -16,7 +16,7 @@ public class LIFOCacheManager<V> extends AbstractCacheManager<V> {
     public LIFOCacheManager(int size) {
         super(size);
         storage = new HashMap<>();
-        stack = new Stack<String>();
+        stack = new Stack<>();
     }
 
     @Override
@@ -45,7 +45,6 @@ public class LIFOCacheManager<V> extends AbstractCacheManager<V> {
         if (this.storage.size() >= this.size && !this.has(key)) {
             evictedKV = this.evict();
         }
-        logger.info("--- lifo update ---");
         if (!this.has(key)) {
             stack.add(keyString);
         }
